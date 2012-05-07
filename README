@@ -1,0 +1,55 @@
+=============================================================================
+	VocabC.c
+	Developed by Johabu <http://johabu.spheniscida.de>; <http://github.com/johabu>
+	
+	This file is part of VocabC.
+	VocabC is free software; you can modify it or redistribute it 
+	under the terms of the GNU General Public License as published by
+	the Free Software Foundation <http://www.fsf.org>, either version 3,
+	or (at your option) any later version.
+	See <http://www.gnu.org/licenses> for the license, if you
+	haven't received a copy of it (GNU_GPL.txt).
+
+	VocabC is distributed without any warranty!
+
+=============================================================================
+
+===================================README====================================
+
+version 1.0 is tested on Linux.
+
+===========================Download and installing===========================
+
+First download the file (VocabC.zip or VocabC.tar.gz) and extract the files.
+
+Linux:
+	Type the following commands in a shell:
+		cd /PATH/TO/VocabC/
+		./install.sh
+		# Eventual 'cp' to /usr/local/bin
+Windows:
+	Compile the files, e.g. with your Visual Studio Express or a Intel C/C++ compiler
+
+=====================================Use=====================================
+
+VocabC is a simple vocabulary trainer. 
+One point is that you can use it with different languages.
+
+1)	To use the program, first create a vocab file.
+		!!!	The vocab has to be in this format:	!!!
+		!!!		word1=word2			!!!
+	Example: file name is e.g. "voc_1.txt"
+		hello=hallo
+		Zeit=time
+		comer=eat
+
+2)	Start the program:
+	type:	VocabC -f <file>
+
+3)	Use:
+	The program asks you the word on the left side in the file.
+	You have to type the word on the right side.
+	Be careful with the spelling!
+	At the end it shows you a analysis (correct words in percent)
+
+=============================================================================
