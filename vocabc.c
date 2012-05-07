@@ -8,6 +8,7 @@
 int main(int argc, char **argv) {
 
 	char *fvalue = NULL;
+	int rvalue = 0;
 	int CHAR;
 	opterr = 0;
 	
@@ -25,9 +26,9 @@ int main(int argc, char **argv) {
 	char temp[40];
 	int index_a, index_b, tmp;
 	int right = 0;
-	int percent;
+	float percent;
 	
-	while ((CHAR = getopt (argc, argv, "hf:")) != -1) {
+	while ((CHAR = getopt (argc, argv, "hrf:")) != -1) {
 		switch (CHAR) {
           		case 'h':
             			printf("\nUse:\tvocabc -f <file>\n");
@@ -35,6 +36,9 @@ int main(int argc, char **argv) {
             		case 'f':
 				fvalue = optarg;
              			break;
+			case 'r':
+				rvalue = 1;
+				break;
            		case '?':
              			if (optopt == 'f') {
                				fprintf (stderr, "Option -%c requires an argument.\n", optopt);
@@ -63,12 +67,14 @@ int main(int argc, char **argv) {
 	for(i = 0; i < pairs; i++) {
 		rand_lines[i] = i+1;
 	}
-	for (j = 0; j < 1000; j++) {
-		index_a = rand() % pairs;
-		index_b = rand() % pairs;
-		tmp = rand_lines[index_a];
-		rand_lines[index_a] = rand_lines[index_b];
-		rand_lines[index_b] = tmp;
+	if (rvalue == 1) {
+		for (j = 0; j < 1000; j++) {
+			index_a = rand() % pairs;
+			index_b = rand() % pairs;
+			tmp = rand_lines[index_a];
+			rand_lines[index_a] = rand_lines[index_b];
+			rand_lines[index_b] = tmp;
+		}
 	}
 	printf("Word pairs: %d\n",pairs);
 	for (k = 0; k < pairs; k++) {
@@ -84,17 +90,17 @@ int main(int argc, char **argv) {
 		strcpy(newstr,strtok(NULL,token));
 		strcpy(lang2_word,newstr);
 		printf("(%d/%d)\t%s ?\n",pair,pairs,lang1_word);
-		scanf("%s",input_str);
+		fscanf(stdin,"%s",input_str);
 		if (strcmp(lang2_word, input_str) == 0) {
-			printf("Right!\n");
-			right++;
+			printf("Correct!\n");
+			right=right+1;
 		} else {
 			printf("Wrong!\n");
 		}
 		pair++;
 	}
-	percent = (right / pairs) * 100;
-	printf("You have known %d%% (%d/%d) of the words.\n",percent,right,pairs);
+	percent = (float) right / (float) pairs * 100;
+	printf("You have known %g%% (%d/%d) of the words.\n",percent,right,pairs);
 	fclose(vocabfile);
        	return EXIT_SUCCESS;
      }

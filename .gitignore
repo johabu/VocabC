@@ -1,4 +1,3 @@
 VocabC
-*.csv
 *.txt
-
+!GNU_GPL.txt
