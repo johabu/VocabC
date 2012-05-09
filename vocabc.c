@@ -8,6 +8,7 @@
 int main(int argc, char **argv) {
 
 	char *fvalue = NULL;
+	char *dvalue = "1";
 	int rvalue = 0;
 	int CHAR;
 	opterr = 0;
@@ -24,14 +25,19 @@ int main(int argc, char **argv) {
 	int pair = 1;
 	int i,j,k,n;
 	char temp[40];
-	int index_a, index_b, tmp;
+	int index_a, index_b, temp_rand;
 	int right = 0;
 	float percent;
+	int check;
+	char temp_word[40];
 	
-	while ((CHAR = getopt (argc, argv, "hrf:")) != -1) {
+	while ((CHAR = getopt (argc, argv, "hrf:d:")) != -1) {
 		switch (CHAR) {
           		case 'h':
-            			printf("\nUse:\tvocabc -f <file>\n");
+				printf("\nVocabC v1.1\n");
+            			printf("\nUse:\tVocabC -f <file>\n");
+				printf("\nOptional arguments:\n-h\tShow this help\n-r\tRandomize the order of the words\n");
+				printf("-d1\tThe program asks the first word\n-d2\tThe program asks the second word\n");
 				return EXIT_FAILURE;	
             		case 'f':
 				fvalue = optarg;
@@ -39,8 +45,11 @@ int main(int argc, char **argv) {
 			case 'r':
 				rvalue = 1;
 				break;
+			case 'd':
+				dvalue = optarg;
+				break;
            		case '?':
-             			if (optopt == 'f') {
+             			if (optopt == 'f' || optopt == 'd') {
                				fprintf (stderr, "Option -%c requires an argument.\n", optopt);
 					return EXIT_FAILURE;
              			} else if (isprint (optopt)) {
@@ -71,9 +80,9 @@ int main(int argc, char **argv) {
 		for (j = 0; j < 1000; j++) {
 			index_a = rand() % pairs;
 			index_b = rand() % pairs;
-			tmp = rand_lines[index_a];
+			temp_rand = rand_lines[index_a];
 			rand_lines[index_a] = rand_lines[index_b];
-			rand_lines[index_b] = tmp;
+			rand_lines[index_b] = temp_rand;
 		}
 	}
 	printf("Word pairs: %d\n",pairs);
@@ -89,8 +98,13 @@ int main(int argc, char **argv) {
 		strcpy(lang1_word,newstr);
 		strcpy(newstr,strtok(NULL,token));
 		strcpy(lang2_word,newstr);
-		printf("(%d/%d)\t%s ?\n",pair,pairs,lang1_word);
-		fscanf(stdin,"%s",input_str);
+		if (strcmp(dvalue,"2") == 0) {
+			strcpy(temp_word,lang1_word);
+			strcpy(lang1_word,lang2_word);
+			strcpy(lang2_word,temp_word);
+		}
+		printf("\n(%d/%d)\t%s ?\n",pair,pairs,lang1_word);
+		check = fscanf(stdin,"%s",input_str);
 		if (strcmp(lang2_word, input_str) == 0) {
 			printf("Correct!\n");
 			right=right+1;
@@ -100,7 +114,7 @@ int main(int argc, char **argv) {
 		pair++;
 	}
 	percent = (float) right / (float) pairs * 100;
-	printf("You have known %g%% (%d/%d) of the words.\n",percent,right,pairs);
+	printf("\nYou have known %g%% (%d/%d) of the words.\n",percent,right,pairs);
 	fclose(vocabfile);
        	return EXIT_SUCCESS;
      }
