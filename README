@@ -17,6 +17,7 @@
 ===================================README====================================
 
 version 1.0 is tested on Linux.
+version 1.1 is tested on Linux.
 
 ===========================Download and installing===========================
 
@@ -45,6 +46,12 @@ One point is that you can use it with different languages.
 
 2)	Start the program:
 	type:	VocabC -f <file>
+	
+	Optional arguments:
+		-h	Show help
+		-r	Random order of the words
+		-d1	Program asks the first word
+		-d2	Program asks the second word
 
 3)	Use:
 	The program asks you the word on the left side in the file.
