@@ -14,23 +14,19 @@ int main(int argc, char **argv) {
 	opterr = 0;
 	
 	FILE *vocabfile;
-	char lang1_word[40];
-	char lang2_word[40];
-	char source_str[40];
-	char newstr[40];
+	char lang1_word[40], lang2_word[40], source_str[40], newstr[40], input_str[40], line[40], temp[40], temp_word[40];
 	char token[] = "=\n";
-	char input_str[40];
-	char line[40];
-	int pairs = 0;
-	int pair = 1;
+	int pairs = 0, pair = 1;
 	int i,j,k,n;
-	char temp[40];
 	int index_a, index_b, temp_rand;
 	int right = 0;
 	float percent;
-	int check;
-	char temp_word[40];
+	int check = 0;
 	
+	if (argc < 2) {
+		printf("Error - VocabC requires argument -f <file>\n");
+		return EXIT_FAILURE;
+	}
 	while ((CHAR = getopt (argc, argv, "hrf:d:")) != -1) {
 		switch (CHAR) {
           		case 'h':
@@ -50,13 +46,13 @@ int main(int argc, char **argv) {
 				break;
            		case '?':
              			if (optopt == 'f' || optopt == 'd') {
-               				fprintf (stderr, "Option -%c requires an argument.\n", optopt);
+               				fprintf (stderr, "Error - Option -%c requires an argument.\n", optopt);
 					return EXIT_FAILURE;
              			} else if (isprint (optopt)) {
-               				fprintf (stderr, "Unknown option `-%c'.\n", optopt);
+               				fprintf (stderr, "Error - Unknown option `-%c'.\n", optopt);
 					return EXIT_FAILURE;
              			} else {
-               				fprintf (stderr,"Unknown option character `\\x%x'.\n",optopt);
+               				fprintf (stderr,"Error - Unknown option character `\\x%x'.\n",optopt);
              				return EXIT_FAILURE;
 				}
            		default:
@@ -65,7 +61,7 @@ int main(int argc, char **argv) {
 	}
 	vocabfile = fopen(fvalue,"r");
 	if (NULL == vocabfile) {
-		printf("\nError in Opening...\n");
+		printf("Error in Opening...\n");
 		return EXIT_FAILURE;
 	}
 	while ((fscanf(vocabfile,"%s\n",line)) != EOF) {
@@ -88,6 +84,7 @@ int main(int argc, char **argv) {
 	printf("Word pairs: %d\n",pairs);
 	for (k = 0; k < pairs; k++) {
 		fseek(vocabfile,0L,SEEK_SET);
+		check = 0;
 		for (n = 0; n < rand_lines[k]-1; n++) {
 			if (fgets(temp, 40, vocabfile) == NULL) 
 				return EXIT_FAILURE;
@@ -103,8 +100,10 @@ int main(int argc, char **argv) {
 			strcpy(lang1_word,lang2_word);
 			strcpy(lang2_word,temp_word);
 		}
-		printf("\n(%d/%d)\t%s ?\n",pair,pairs,lang1_word);
-		check = fscanf(stdin,"%s",input_str);
+		printf("\n(%d/%d)\t%s ?\n>>> ",pair,pairs,lang1_word);
+		while (check != 1) {
+			check = fscanf(stdin,"%s",input_str);
+		}
 		if (strcmp(lang2_word, input_str) == 0) {
 			printf("Correct!\n");
 			right=right+1;
@@ -114,7 +113,7 @@ int main(int argc, char **argv) {
 		pair++;
 	}
 	percent = (float) right / (float) pairs * 100;
-	printf("\nYou have known %g%% (%d/%d) of the words.\n",percent,right,pairs);
+	printf("\nYou have known %g%% (%d/%d) of the words.\n\n",percent,right,pairs);
 	fclose(vocabfile);
        	return EXIT_SUCCESS;
      }
