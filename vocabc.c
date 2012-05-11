@@ -9,6 +9,7 @@ int main(int argc, char **argv) {
 
 	char *fvalue = NULL;
 	char *dvalue = "1";
+	char *nvalue = "all";
 	int rvalue = 0;
 	int CHAR;
 	opterr = 0;
@@ -17,6 +18,7 @@ int main(int argc, char **argv) {
 	char lang1_word[40], lang2_word[40], source_str[40], newstr[40], input_str[40], line[40], temp[40], temp_word[40];
 	char token[] = "=\n";
 	int pairs = 0, pair = 1;
+	int lines = 0;
 	int i,j,k,n;
 	int index_a, index_b, temp_rand;
 	int right = 0;
@@ -27,13 +29,14 @@ int main(int argc, char **argv) {
 		printf("Error - VocabC requires argument -f <file>\n");
 		return EXIT_FAILURE;
 	}
-	while ((CHAR = getopt (argc, argv, "hrf:d:")) != -1) {
+	while ((CHAR = getopt (argc, argv, "hrf:d:n:")) != -1) {
 		switch (CHAR) {
           		case 'h':
-				printf("\nVocabC v1.1\n");
+				printf("\nVocabC v1.2\n");
             			printf("\nUse:\tVocabC -f <file>\n");
 				printf("\nOptional arguments:\n-h\tShow this help\n-r\tRandomize the order of the words\n");
 				printf("-d1\tThe program asks the first word\n-d2\tThe program asks the second word\n");
+				printf("-n <num>\tAsk only <num> words\n");
 				return EXIT_FAILURE;	
             		case 'f':
 				fvalue = optarg;
@@ -43,6 +46,9 @@ int main(int argc, char **argv) {
 				break;
 			case 'd':
 				dvalue = optarg;
+				break;
+			case 'n':
+				nvalue = optarg;
 				break;
            		case '?':
              			if (optopt == 'f' || optopt == 'd') {
@@ -65,21 +71,30 @@ int main(int argc, char **argv) {
 		return EXIT_FAILURE;
 	}
 	while ((fscanf(vocabfile,"%s\n",line)) != EOF) {
-		pairs++;
+		lines++;
 	}
 	srand(time(NULL));
-	int rand_lines[pairs-1];
-	for(i = 0; i < pairs; i++) {
+	int rand_lines[lines-1];
+	for(i = 0; i < lines; i++) {
 		rand_lines[i] = i+1;
 	}
 	if (rvalue == 1) {
 		for (j = 0; j < 1000; j++) {
-			index_a = rand() % pairs;
-			index_b = rand() % pairs;
+			index_a = rand() % lines;
+			index_b = rand() % lines;
 			temp_rand = rand_lines[index_a];
 			rand_lines[index_a] = rand_lines[index_b];
 			rand_lines[index_b] = temp_rand;
 		}
+	}
+	if (strcmp(nvalue, "all") == 0) {
+		pairs = lines;
+	} else {
+		pairs = atoi(nvalue);
+	}
+	if (pairs > lines) {
+		printf("Error - too high argument of option -n\n ");
+		return EXIT_FAILURE;
 	}
 	printf("Word pairs: %d\n",pairs);
 	for (k = 0; k < pairs; k++) {
