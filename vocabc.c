@@ -15,11 +15,14 @@ int main(int argc, char **argv) {
 	opterr = 0;
 	
 	FILE *vocabfile;
-	char lang1_word[40], lang2_word[40], source_str[40], newstr[40], input_str[40], line[40], temp[40], temp_word[40];
-	char token[] = "=\n";
+	char lang1_word[40], source_str[40], input_str[40], line[40], temp[40], temp_word[40];
+	char lang2_word[5][40];
+	char *ptr;
+	char token[] = "=,\n";
 	int pairs = 0, pair = 1;
 	int lines = 0;
-	int i,j,k,n;
+	int word = 0;
+	int i,j,k,l,n;
 	int index_a, index_b, temp_rand;
 	int right = 0;
 	float percent;
@@ -31,7 +34,7 @@ int main(int argc, char **argv) {
 	while ((CHAR = getopt (argc, argv, "hrf:d:n:")) != -1) {
 		switch (CHAR) {
           		case 'h':
-				printf("\nVocabC v1.2\n");
+				printf("\nVocabC v1.3\n");
             			printf("\nUse:\tVocabC -f <file>\n");
 				printf("\nOptional arguments:\n-h\tShow this help\n-r\tRandomize the order of the words\n");
 				printf("-d1\tThe program asks the first word\n-d2\tThe program asks the second word\n");
@@ -98,30 +101,44 @@ int main(int argc, char **argv) {
 	printf("Word pairs: %d\n",pairs);
 	for (k = 0; k < pairs; k++) {
 		fseek(vocabfile,0L,SEEK_SET);
+		word = 0;
 		for (n = 0; n < rand_lines[k]-1; n++) {
 			if (fgets(temp, 40, vocabfile) == NULL) 
 				return EXIT_FAILURE;
 		}
 		if (fgets(source_str,40,vocabfile) == NULL)
 			return EXIT_FAILURE;
-		strcpy(newstr,strtok(source_str,token));
-		strcpy(lang1_word,newstr);
-		strcpy(newstr,strtok(NULL,token));
-		strcpy(lang2_word,newstr);
+		ptr = strtok(source_str,token);
+		strcpy(lang1_word,ptr);
+		while (ptr != NULL) {
+			ptr = strtok(NULL,token);
+			if (ptr != NULL) {
+				strcpy(lang2_word[word],ptr);
+			}
+		word++;
+		}
 		if (strcmp(dvalue,"2") == 0) {
 			strcpy(temp_word,lang1_word);
-			strcpy(lang1_word,lang2_word);
-			strcpy(lang2_word,temp_word);
+			strcpy(lang1_word,lang2_word[0]);
+			strcpy(lang2_word[0],temp_word);
 		}
 		printf("\n(%d/%d)\t%s ?\n>>> ",pair,pairs,lang1_word);
-		if(fgets(input_str,40,stdin) == NULL)
+		if(fgets(input_str,40,stdin) == NULL) {
+			printf("Error in input...");
 			return EXIT_FAILURE;
+		}
 		input_str[strlen(input_str)-1] = '\0';
-		if (strcmp(lang2_word, input_str) == 0) {
+		int correct = 0;
+		for (l = 0; l < 5; l++) {
+			if (strcmp(lang2_word[l], input_str) == 0) {
+				correct = 1;
+			}
+		}
+		if (correct == 1) {
 			printf("Correct!\n");
-			right=right+1;
+			right++;
 		} else {
-			printf("Wrong!\n");
+			printf("Wrong!\tRight: %s\n",lang2_word[0]);
 		}
 		pair++;
 	}
@@ -129,5 +146,5 @@ int main(int argc, char **argv) {
 	printf("\nYou have known %g%% (%d/%d) of the words.\n\n",percent,right,pairs);
 	fclose(vocabfile);
        	return EXIT_SUCCESS;
-     }
+}
 
