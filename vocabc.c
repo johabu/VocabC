@@ -23,7 +23,6 @@ int main(int argc, char **argv) {
 	int index_a, index_b, temp_rand;
 	int right = 0;
 	float percent;
-	int check = 0;
 	
 	if (argc < 2) {
 		printf("Error - VocabC requires argument -f <file>\n");
@@ -70,7 +69,7 @@ int main(int argc, char **argv) {
 		printf("Error in Opening...\n");
 		return EXIT_FAILURE;
 	}
-	while ((fscanf(vocabfile,"%s\n",line)) != EOF) {
+	while ((fgets(line,40,vocabfile)) != NULL) {
 		lines++;
 	}
 	srand(time(NULL));
@@ -99,7 +98,6 @@ int main(int argc, char **argv) {
 	printf("Word pairs: %d\n",pairs);
 	for (k = 0; k < pairs; k++) {
 		fseek(vocabfile,0L,SEEK_SET);
-		check = 0;
 		for (n = 0; n < rand_lines[k]-1; n++) {
 			if (fgets(temp, 40, vocabfile) == NULL) 
 				return EXIT_FAILURE;
@@ -116,9 +114,9 @@ int main(int argc, char **argv) {
 			strcpy(lang2_word,temp_word);
 		}
 		printf("\n(%d/%d)\t%s ?\n>>> ",pair,pairs,lang1_word);
-		while (check != 1) {
-			check = fscanf(stdin,"%s",input_str);
-		}
+		if(fgets(input_str,40,stdin) == NULL)
+			return EXIT_FAILURE;
+		input_str[strlen(input_str)-1] = '\0';
 		if (strcmp(lang2_word, input_str) == 0) {
 			printf("Correct!\n");
 			right=right+1;
