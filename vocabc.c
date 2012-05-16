@@ -5,6 +5,8 @@
 #include <string.h>
 #include <time.h>
 
+#define MAX_WORDS 5
+
 int main(int argc, char **argv) {
 
 	char *fvalue = NULL;
@@ -16,18 +18,22 @@ int main(int argc, char **argv) {
 	
 	FILE *vocabfile;
 	char lang1_word[40], source_str[40], input_str[40], line[40], temp[40], temp_word[40];
-	char lang2_word[5][40];
+	char lang2_word[MAX_WORDS][40];
 	char *ptr;
 	char token[] = "=,\n";
 	int pairs = 0, pair = 1;
 	int lines = 0;
 	int word = 0;
-	int i,j,k,l,n;
+	int i,j,k,l,m,n;
+	int is_giv;
 	int index_a, index_b, temp_rand;
 	int right = 0;
 	float percent;
-	
-	if (argc < 2) {
+
+	for (i = 0; i < MAX_WORDS; i++) {
+		strcpy(lang2_word[i],"NULL");
+	}
+		if (argc < 2) {
 		printf("Error - VocabC requires argument -f <file>\n");
 		return EXIT_FAILURE;
 	}
@@ -117,10 +123,18 @@ int main(int argc, char **argv) {
 			}
 		word++;
 		}
+		is_giv = 0;
 		if (strcmp(dvalue,"2") == 0) {
+			m = rand() % MAX_WORDS;
+			while (is_giv != 1) {
+				m = rand() % MAX_WORDS;
+				if (strcmp(lang2_word[m],"NULL") != 0) {
+					is_giv = 1;
+				}
+			}
 			strcpy(temp_word,lang1_word);
-			strcpy(lang1_word,lang2_word[0]);
-			strcpy(lang2_word[0],temp_word);
+			strcpy(lang1_word,lang2_word[m]);
+			strcpy(lang2_word[m],temp_word);
 		}
 		printf("\n(%d/%d)\t%s ?\n>>> ",pair,pairs,lang1_word);
 		if(fgets(input_str,40,stdin) == NULL) {
