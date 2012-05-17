@@ -6,6 +6,8 @@
 #include <time.h>
 
 #define MAX_WORDS 5
+#define MAX_TRIES 2
+#define MAX_LENGTH 40
 
 int main(int argc, char **argv) {
 
@@ -17,8 +19,8 @@ int main(int argc, char **argv) {
 	opterr = 0;
 	
 	FILE *vocabfile;
-	char lang1_word[40], source_str[40], input_str[40], line[40], temp[40], temp_word[40];
-	char lang2_word[MAX_WORDS][40];
+	char lang1_word[MAX_LENGTH], source_str[MAX_LENGTH], input_str[MAX_LENGTH], line[MAX_LENGTH], temp[MAX_LENGTH], temp_word[MAX_LENGTH];
+	char lang2_word[MAX_WORDS][MAX_LENGTH];
 	char *ptr;
 	char token[] = "=,\n";
 	int pairs = 0, pair = 1;
@@ -78,7 +80,7 @@ int main(int argc, char **argv) {
 		printf("Error in Opening...\n");
 		return EXIT_FAILURE;
 	}
-	while ((fgets(line,40,vocabfile)) != NULL) {
+	while ((fgets(line,MAX_LENGTH,vocabfile)) != NULL) {
 		lines++;
 	}
 	srand(time(NULL));
@@ -109,10 +111,10 @@ int main(int argc, char **argv) {
 		fseek(vocabfile,0L,SEEK_SET);
 		word = 0;
 		for (n = 0; n < rand_lines[k]-1; n++) {
-			if (fgets(temp, 40, vocabfile) == NULL) 
+			if (fgets(temp, MAX_LENGTH, vocabfile) == NULL) 
 				return EXIT_FAILURE;
 		}
-		if (fgets(source_str,40,vocabfile) == NULL)
+		if (fgets(source_str, MAX_LENGTH, vocabfile) == NULL)
 			return EXIT_FAILURE;
 		ptr = strtok(source_str,token);
 		strcpy(lang1_word,ptr);
@@ -138,10 +140,10 @@ int main(int argc, char **argv) {
 		}
 		correct = 0;
 		tries = 0;
-		while (tries < 2 && correct != 1) {
+		while (tries < MAX_TRIES && correct != 1) {
 			tries++;
-			printf("\n(%d/%d)\t%s ?\n>>> ",pair,pairs,lang1_word);
-			if(fgets(input_str,40,stdin) == NULL) {
+			printf("\n(%d/%d)\t%s ?\n>>> ", pair, pairs, lang1_word);
+			if(fgets(input_str, MAX_LENGTH, stdin) == NULL) {
 				printf("Error in input...");
 				return EXIT_FAILURE;
 			}
