@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
 	int i,j,k,l,m,n;
 	int is_giv;
 	int index_a, index_b, temp_rand;
-	int right = 0;
+	int right = 0, correct = 0, tries = 0;
 	float percent;
 
 	for (i = 0; i < MAX_WORDS; i++) {
@@ -136,24 +136,32 @@ int main(int argc, char **argv) {
 			strcpy(lang1_word,lang2_word[m]);
 			strcpy(lang2_word[m],temp_word);
 		}
-		printf("\n(%d/%d)\t%s ?\n>>> ",pair,pairs,lang1_word);
-		if(fgets(input_str,40,stdin) == NULL) {
-			printf("Error in input...");
-			return EXIT_FAILURE;
-		}
-		input_str[strlen(input_str)-1] = '\0';
-		int correct = 0;
-		for (l = 0; l < 5; l++) {
-			if (strcmp(lang2_word[l], input_str) == 0) {
-				correct = 1;
+		correct = 0;
+		tries = 0;
+		while (tries < 2 && correct != 1) {
+			tries++;
+			printf("\n(%d/%d)\t%s ?\n>>> ",pair,pairs,lang1_word);
+			if(fgets(input_str,40,stdin) == NULL) {
+				printf("Error in input...");
+				return EXIT_FAILURE;
+			}
+			input_str[strlen(input_str)-1] = '\0';
+			for (l = 0; l < 5; l++) {
+				if (strcmp(lang2_word[l], input_str) == 0) {
+					correct = 1;
+				}
+			}
+			if (correct == 1) {
+				printf("Correct!\n");
+				right++;
+			} else {
+				printf("Wrong!");
 			}
 		}
-		if (correct == 1) {
-			printf("Correct!\n");
-			right++;
-		} else {
-			printf("Wrong!\tRight: %s\n",lang2_word[0]);
+		if (correct != 1) {
+			printf("\tCorrect was %s",lang2_word[0]);
 		}
+		printf("\n");
 		pair++;
 	}
 	percent = (float) right / (float) pairs * 100;
