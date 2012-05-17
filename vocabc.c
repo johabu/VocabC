@@ -9,6 +9,15 @@
 #define MAX_TRIES 2
 #define MAX_LENGTH 40
 
+char *errors[] = {"VocabC requires argument -f <file>","Error in opening vocabulary file","too high argument of option -n","Error in reading vocabulary file",
+			"Error in input"};
+
+int Error(int error) {
+	printf("Error - %s!\n",errors[error]);
+	exit(EXIT_FAILURE);
+}
+
+
 int main(int argc, char **argv) {
 
 	char *fvalue = NULL;
@@ -36,8 +45,7 @@ int main(int argc, char **argv) {
 		strcpy(lang2_word[i],"NULL");
 	}
 		if (argc < 2) {
-		printf("Error - VocabC requires argument -f <file>\n");
-		return EXIT_FAILURE;
+			Error(0);
 	}
 	while ((CHAR = getopt (argc, argv, "hrf:d:n:")) != -1) {
 		switch (CHAR) {
@@ -77,8 +85,7 @@ int main(int argc, char **argv) {
 	}
 	vocabfile = fopen(fvalue,"r");
 	if (NULL == vocabfile) {
-		printf("Error in Opening...\n");
-		return EXIT_FAILURE;
+		Error(1);
 	}
 	while ((fgets(line,MAX_LENGTH,vocabfile)) != NULL) {
 		lines++;
@@ -103,8 +110,7 @@ int main(int argc, char **argv) {
 		pairs = atoi(nvalue);
 	}
 	if (pairs > lines) {
-		printf("Error - too high argument of option -n\n ");
-		return EXIT_FAILURE;
+		Error(2);
 	}
 	printf("Word pairs: %d\n",pairs);
 	for (k = 0; k < pairs; k++) {
@@ -112,10 +118,10 @@ int main(int argc, char **argv) {
 		word = 0;
 		for (n = 0; n < rand_lines[k]-1; n++) {
 			if (fgets(temp, MAX_LENGTH, vocabfile) == NULL) 
-				return EXIT_FAILURE;
+				Error(3);
 		}
 		if (fgets(source_str, MAX_LENGTH, vocabfile) == NULL)
-			return EXIT_FAILURE;
+			Error(3);
 		ptr = strtok(source_str,token);
 		strcpy(lang1_word,ptr);
 		while (ptr != NULL) {
@@ -144,8 +150,7 @@ int main(int argc, char **argv) {
 			tries++;
 			printf("\n(%d/%d)\t%s ?\n>>> ", pair, pairs, lang1_word);
 			if(fgets(input_str, MAX_LENGTH, stdin) == NULL) {
-				printf("Error in input...");
-				return EXIT_FAILURE;
+				Error(4);
 			}
 			input_str[strlen(input_str)-1] = '\0';
 			for (l = 0; l < 5; l++) {
