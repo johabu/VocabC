@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
 	while ((CHAR = getopt (argc, argv, "hrf:d:n:")) != -1) {
 		switch (CHAR) {
           		case 'h':
-				printf("\nVocabC v1.3\n");
+				printf("\nVocabC v1.4\n");
             			printf("\nUse:\tVocabC -f <file>\n");
 				printf("\nOptional arguments:\n-h\tShow this help\n-r\tRandomize the order of the words\n");
 				printf("-d1\tThe program asks the first word\n-d2\tThe program asks the second word\n");
