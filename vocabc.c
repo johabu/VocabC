@@ -1,10 +1,11 @@
+// #####	VocabC v1.4	##### //
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <ctype.h>
 #include <string.h>
 #include <time.h>
-
 #define MAX_WORDS 5
 #define MAX_TRIES 2
 #define MAX_LENGTH 40

@@ -1,6 +1,7 @@
 =============================================================================
 	VocabC.c
-	Developed by Johabu <http://johabu.spheniscida.de>; <http://github.com/johabu>
+	Developed by Johabu <http://johabu.spheniscida.de>;
+				<http://github.com/johabu>
 	
 	This file is part of VocabC.
 	VocabC is free software; you can modify it or redistribute it 
@@ -30,7 +31,8 @@ Linux:
 		./install.sh
 		# Eventual 'cp' to /usr/local/bin
 Windows:
-	Compile the files, e.g. with your Visual Studio Express or a Intel C/C++ compiler
+	Compile the files, e.g. with your Visual Studio Express or a Intel C/C++
+	compiler.
 
 =====================================Use=====================================
 
@@ -56,9 +58,10 @@ One point is that you can use it with different languages.
 		-n <num>	ask <num> words
 
 3)	Use:
-	The program asks you the word on the left side in the file.
-	You have to type the word on the right side.
-	Be careful with the spelling!
-	At the end it shows you a analysis (correct words in percent)
+	The program asks you for the word on the right side in the file.
+	(when you set -d2, it asks you for the left one)
+	You have to type the word from the right side.
+	Be careful with the spelling! You have two tries, e.g. if you mispelled a word.
+	At the end it shows you an analysis (correct words in percent).
 
 =============================================================================
