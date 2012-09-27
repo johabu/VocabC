@@ -1,3 +1,4 @@
 VocabC
 *.txt
 !GNU_GPL.txt
+!example.txt

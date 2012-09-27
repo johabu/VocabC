@@ -1,0 +1,8 @@
+german=deutsch,alemán
+spanish=español,spanisch
+Guten Tag=Good day
+brother=frère
+example=esempio
+money=Geld
+to fit=caber
+
