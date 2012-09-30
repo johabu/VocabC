@@ -8,7 +8,7 @@
 #include <time.h>
 #define MAX_WORDS 5
 #define MAX_TRIES 2
-#define MAX_LENGTH 40
+#define MAX_LENGTH 150
 
 char *errors[] = {"VocabC requires argument -f <file>","Error in opening vocabulary file","too high argument of option -n","Error in reading vocabulary file",
 			"Error in input"};
@@ -90,6 +90,8 @@ int main(int argc, char **argv) {
              			return EXIT_FAILURE;
            	}
 	}
+	//Clear screen
+	system("clear");
 	//Open vocabulary file
 	vocabfile = fopen(fvalue,"r");
 	if (NULL == vocabfile) {
@@ -125,6 +127,7 @@ int main(int argc, char **argv) {
 		Error(2);
 	}
 	printf("Word pairs: %d\n",pairs);
+	//main loop with query
 	for (i = 0; i < pairs; i++) {
 		fseek(vocabfile,0L,SEEK_SET);
 		word = 0;
@@ -181,7 +184,7 @@ int main(int argc, char **argv) {
 		while (tries < MAX_TRIES && correct != 1) {
 			tries++;
 			//ask user a word
-			printf("\n(%d/%d)\t%s ?\n>>> ", pair, pairs, lang1_word);
+			printf("\n(%d/%d)\t%s \n>>> ", pair, pairs, lang1_word);
 			//user gives answer
 			if(fgets(input_str, MAX_LENGTH, stdin) == NULL) {
 				Error(4);
@@ -204,7 +207,7 @@ int main(int argc, char **argv) {
 		}
 		//too many tries? -> next word
 		if (correct != 1) {
-			printf("\tCorrect was %s",lang2_word[0]);
+			printf("\tCorrect was: \"%s\"",lang2_word[0]);
 		}
 		printf("\n");
 		pair++;
@@ -215,4 +218,3 @@ int main(int argc, char **argv) {
 	fclose(vocabfile);
        	return EXIT_SUCCESS;
 }
-
