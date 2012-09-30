@@ -17,9 +17,8 @@
 
 ===================================README====================================
 
-version 1.1 is tested on Linux.
-version 1.2 is tested on Linux.
-version 1.3 is tested on Linux.
+version 1.4 is tested on Linux.
+version 1.5 is tested on Linux.
 
 ===========================Download and installing===========================
 
@@ -43,9 +42,10 @@ One point is that you can use it with different languages.
 		!!!	The vocab has to be in this format:	!!!
 		!!!		word1=word2a,word2b		!!!
 	Example: file name is e.g. "voc_1.txt"
-		passend=fit,suitable 		#several meanings possible
-		Zeit=time			
-		comer=to eat			#spaces possible
+		Personal=personnel,staff	#several meanings possible
+		german=deutsch,alemán		#many languages possible (ISO 8859-15)
+		to fit=caber			#spaces possible
+	See also the vocabulary file "example.txt"
 
 2)	Start the program:
 	type:	VocabC -f <file>
@@ -56,6 +56,7 @@ One point is that you can use it with different languages.
 		-d1		Program asks the first word
 		-d2		Program asks the second word
 		-n <num>	ask <num> words
+		-c		case-sensitivity
 
 3)	Use:
 	The program asks you for the word on the right side in the file.

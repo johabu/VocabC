@@ -1,4 +1,4 @@
-// #####	VocabC v1.4	##### //
+// #####	VocabC v1.5	##### //
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -45,9 +45,6 @@ int main(int argc, char **argv) {
 	float bar_num;
 	float bar_loop;
 
-	for (i = 0; i < MAX_WORDS; i++) {
-		strcpy(lang2_word[i],"NULL");
-	}
 	if (argc < 2) {
 		Error(0);
 	}
@@ -59,7 +56,7 @@ int main(int argc, char **argv) {
 				printf("\nOptional arguments:\n-h\tShow this help\n-r\tRandomize the order of the words\n");
 				printf("-d1\tThe program asks the first word\n-d2\tThe program asks the second word\n-dr\tthe program asks randomly\n");
 				printf("-n <num>\tAsk only <num> words\n");
-				printf("-c\tCase-insensitive\n");
+				printf("-c\tCase sensitive\n");
 				return EXIT_FAILURE;	
             		case 'f':
 				fvalue = optarg;
@@ -132,6 +129,11 @@ int main(int argc, char **argv) {
 	printf("Word pairs: %d\n",pairs);
 	//main loop with query
 	for (i = 0; i < pairs; i++) {
+		strcpy(temp_word,"NULL");
+		strcpy(lang1_word,"NULL");
+		for (j = 0; j < MAX_WORDS; j++) {
+			strcpy(lang2_word[j],"NULL");
+		}
 		fseek(vocabfile,0L,SEEK_SET);
 		word = 0;
 		//read lines until line i

@@ -1,3 +1,4 @@
+Personal=personnel,staff
 german=deutsch,alemán
 spanish=español,spanisch
 Guten Tag=Good day
