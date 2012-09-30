@@ -32,7 +32,6 @@ int main(int argc, char **argv) {
 	FILE *vocabfile;
 	char lang1_word[MAX_LENGTH], source_str[MAX_LENGTH], input_str[MAX_LENGTH], line[MAX_LENGTH], temp[MAX_LENGTH], temp_word[MAX_LENGTH];
 	char lang2_word[MAX_WORDS][MAX_LENGTH];
-	char lang2_word2[MAX_WORDS][MAX_LENGTH];
 	char *ptr;
 	char token[] = "=,\n";
 	int pairs = 0, pair = 1;
@@ -47,8 +46,8 @@ int main(int argc, char **argv) {
 	for (i = 0; i < MAX_WORDS; i++) {
 		strcpy(lang2_word[i],"NULL");
 	}
-		if (argc < 2) {
-			Error(0);
+	if (argc < 2) {
+		Error(0);
 	}
 	while ((CHAR = getopt (argc, argv, "hrf:d:n:c")) != -1) {
 		switch (CHAR) {
@@ -56,9 +55,9 @@ int main(int argc, char **argv) {
 				printf("\nVocabC v1.4\n");
             			printf("\nUse:\tVocabC -f <file>\n");
 				printf("\nOptional arguments:\n-h\tShow this help\n-r\tRandomize the order of the words\n");
-				printf("-d1\tThe program asks the first word\n-d2\tThe program asks the second word\n");
+				printf("-d1\tThe program asks the first word\n-d2\tThe program asks the second word\n-dr\tthe program asks randomly\n");
 				printf("-n <num>\tAsk only <num> words\n");
-				printf("-c\tCase-sensitive\n");
+				printf("-c\tCase-insensitive\n");
 				return EXIT_FAILURE;	
             		case 'f':
 				fvalue = optarg;
@@ -117,6 +116,8 @@ int main(int argc, char **argv) {
 			rand_lines[index_b] = temp_rand;
 		}
 	}
+	//How many words should be asked?
+		//ask all pairs
 	if (strcmp(nvalue, "all") == 0) {
 		pairs = lines;
 	} else {
@@ -166,19 +167,6 @@ int main(int argc, char **argv) {
 			strcpy(lang1_word,lang2_word[k]);
 			strcpy(lang2_word[k],temp_word);
 		}
-		//copy lang2_word in lang2_word2
-		for (j = 0; j < 5; j++) {
-			strcpy(lang2_word2[j],lang2_word[j]);
-			//if not case-senisitve
-			if (cvalue == 0) {
-				//switch first letter in lang2_word2 (lower->upper, upper->lower)
-				if (isupper(lang2_word2[j][0]) != 0) {
-					lang2_word2[j][0] = tolower(lang2_word2[j][0]);
-				} else {
-					lang2_word2[j][0] = toupper(lang2_word2[j][0]);
-				}
-			}
-		}
 		correct = 0;
 		tries = 0;
 		while (tries < MAX_TRIES && correct != 1) {
@@ -193,8 +181,14 @@ int main(int argc, char **argv) {
 			input_str[strlen(input_str)-1] = '\0';
 			//is any of the meanings equal to the user`s answer?
 			for (j = 0; j < 5; j++) {
-				if (strcmp(lang2_word[j], input_str) == 0 || strcmp(lang2_word2[j], input_str) == 0) {
-					correct = 1;
+				if (cvalue == 1) {
+					if (strcmp(lang2_word[j], input_str) == 0) {
+						correct = 1;
+					}
+				} else {
+					if (strcasecmp(lang2_word[j], input_str) == 0) {
+						correct = 1;
+					}
 				}
 			}
 			//display "correct" or "wrong"
