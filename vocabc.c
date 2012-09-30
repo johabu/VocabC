@@ -20,7 +20,7 @@ int Error(int error) {
 
 
 int main(int argc, char **argv) {
-
+	//variables for getopt
 	char *fvalue = NULL;
 	char *dvalue = "1";
 	char *nvalue = "all";
@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
 	int cvalue = 0;
 	int CHAR;
 	opterr = 0;
-	
+	//variables for query and output
 	FILE *vocabfile;
 	char lang1_word[MAX_LENGTH], source_str[MAX_LENGTH], input_str[MAX_LENGTH], line[MAX_LENGTH], temp[MAX_LENGTH], temp_word[MAX_LENGTH];
 	char lang2_word[MAX_WORDS][MAX_LENGTH];
@@ -42,6 +42,8 @@ int main(int argc, char **argv) {
 	int index_a, index_b, temp_rand;
 	int right = 0, correct = 0, tries = 0;
 	float percent;
+	float bar_num;
+	float bar_loop;
 
 	for (i = 0; i < MAX_WORDS; i++) {
 		strcpy(lang2_word[i],"NULL");
@@ -172,7 +174,12 @@ int main(int argc, char **argv) {
 		while (tries < MAX_TRIES && correct != 1) {
 			tries++;
 			//ask user a word
-			printf("\n(%d/%d)\t%s \n>>> ", pair, pairs, lang1_word);
+			printf("\n(%d/%d)\t[", pair, pairs);
+			bar_num = (float) pair / (float) pairs * 10;
+			for (bar_loop=1; bar_loop<=10; bar_loop++) {
+				(bar_loop<=bar_num) ? printf("=") : printf(" ");
+			}
+			printf("]  :?:  %s\n>>>  ",lang1_word);
 			//user gives answer
 			if(fgets(input_str, MAX_LENGTH, stdin) == NULL) {
 				Error(4);
