@@ -37,10 +37,12 @@ int main(int argc, char **argv) {
 	int pairs = 0, pair = 1;
 	int lines = 0;
 	int word = 0;
-	int i,j,k;
+	int i,j;
+	int k = 0;
 	int is_giv;
 	int index_a, index_b, temp_rand;
 	int right = 0, correct = 0, tries = 0;
+	char direction[2] = "1";
 	float percent;
 	float bar_num;
 	float bar_loop;
@@ -156,8 +158,18 @@ int main(int argc, char **argv) {
 			word++;
 		}
 		is_giv = 0;
-		// if -d2 is set
-		if (strcmp(dvalue,"2") == 0) {
+		//is -dr set?
+		if (strcmp(dvalue,"r") != 0) {
+				strcpy(direction,dvalue);
+		} else {
+			if ((rand() % 2) != 0) {
+				strcpy(direction,"2");
+			} else {
+				strcpy(direction,"1");
+			}
+		}
+		//if direction is "2"
+		if (strcmp(direction,"2") == 0) {
 			//choose one meaning of a word
 			k = rand() % MAX_WORDS;
 			while (is_giv != 1) {
@@ -189,13 +201,25 @@ int main(int argc, char **argv) {
 			//removing '\n'
 			input_str[strlen(input_str)-1] = '\0';
 			//is any of the meanings equal to the user`s answer?
-			for (j = 0; j < 5; j++) {
+			if (strcmp(direction,"2") != 0) {
+				for (j = 0; j < 5; j++) {
+					if (cvalue == 1) {
+						if (strcmp(lang2_word[j], input_str) == 0) {
+							correct = 1;
+						}
+					} else {
+						if (strcasecmp(lang2_word[j], input_str) == 0) {
+							correct = 1;
+						}
+					}
+				}
+			} else {
 				if (cvalue == 1) {
-					if (strcmp(lang2_word[j], input_str) == 0) {
+					if (strcmp(lang2_word[k], input_str) == 0) {
 						correct = 1;
 					}
 				} else {
-					if (strcasecmp(lang2_word[j], input_str) == 0) {
+					if (strcasecmp(lang2_word[k], input_str) == 0) {
 						correct = 1;
 					}
 				}
