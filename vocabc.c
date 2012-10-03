@@ -1,4 +1,4 @@
-// #####	VocabC v1.5	##### //
+// #####	VocabC v1.6	##### //
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -10,11 +10,18 @@
 #define MAX_TRIES 2
 #define MAX_LENGTH 150
 
+FILE *vocabfile;
+FILE *sourcefile;
+
 char *errors[] = {"VocabC requires argument -f <file>","Error in opening vocabulary file","too high argument of option -n","Error in reading vocabulary file",
-			"Error in input"};
+			"Error in input","Error in deleting temporary file","Unable to clear screen","Internal Error"};
 
 int Error(int error) {
-	printf("Error - %s!\n",errors[error]);
+	printf("Error %d - %s!\n",error,errors[error]);
+	if (remove("vocab.tmp") < 0) {
+		fclose(vocabfile);
+		remove("vocab.tmp");
+	}
 	exit(EXIT_FAILURE);
 }
 
@@ -29,7 +36,7 @@ int main(int argc, char **argv) {
 	int CHAR;
 	opterr = 0;
 	//variables for query and output
-	FILE *vocabfile;
+	char buffer[MAX_LENGTH];
 	char lang1_word[MAX_LENGTH], source_str[MAX_LENGTH], input_str[MAX_LENGTH], line[MAX_LENGTH], temp[MAX_LENGTH], temp_word[MAX_LENGTH];
 	char lang2_word[MAX_WORDS][MAX_LENGTH];
 	char *ptr;
@@ -53,7 +60,7 @@ int main(int argc, char **argv) {
 	while ((CHAR = getopt (argc, argv, "hrf:d:n:c")) != -1) {
 		switch (CHAR) {
           		case 'h':
-				printf("\nVocabC v1.4\n");
+				printf("\nVocabC v1.6\n");
             			printf("\nUse:\tVocabC -f <file>\n");
 				printf("\nOptional arguments:\n-h\tShow this help\n-r\tRandomize the order of the words\n");
 				printf("-d1\tThe program asks the first word\n-d2\tThe program asks the second word\n-dr\tthe program asks randomly\n");
@@ -91,11 +98,24 @@ int main(int argc, char **argv) {
            	}
 	}
 	//Clear screen
-	system("clear");
+	if (system("clear") == -1) {
+		Error(6);
+	}
 	//Open vocabulary file
-	vocabfile = fopen(fvalue,"r");
-	if (NULL == vocabfile) {
+	sourcefile = fopen(fvalue,"r");
+	vocabfile = fopen("vocab.tmp","w");
+	if (NULL == vocabfile || NULL == sourcefile) {
 		Error(1);
+	}
+	//copy lines from source to temporary file
+	while((fgets(buffer, sizeof(buffer), sourcefile)) != NULL) {
+		if (buffer[0] != '#') {
+			fputs(buffer, vocabfile);
+		}
+	}
+	//reopen temporary file to read lines
+	if (freopen("vocab.tmp","r",vocabfile) == NULL) {
+		Error(7);
 	}
 	//Count lines
 	while ((fgets(line,MAX_LENGTH,vocabfile)) != NULL) {
@@ -241,7 +261,11 @@ int main(int argc, char **argv) {
 	}
 	percent = (float) right / (float) pairs * 100;
 	printf("\nYou have known %g%% (%d/%d) of the words.\n\n",percent,right,pairs);
-	//End of program, close file
+	//End of program, close files, remove temporary file
 	fclose(vocabfile);
+	fclose(sourcefile);
+	if (remove("vocab.tmp") < 0) {
+		Error(5);
+	}
        	return EXIT_SUCCESS;
 }

@@ -19,10 +19,12 @@
 
 version 1.4 is tested on Linux.
 version 1.5 is tested on Linux.
+version 1.6 is tested on Linux.
 
 ===========================Download and installing===========================
 
-First download the file (VocabC.zip or VocabC.tar.gz) and extract the files.
+First download the file (VocabC.zip or VocabC.tar.gz) or clone the repository
+and extract the files.
 
 Linux:
 	Type the following commands in a shell:
@@ -43,6 +45,7 @@ One point is that you can use it with different languages.
 		!!!		word1=word2a,word2b		!!!
 	Example: file name is e.g. "voc_1.txt"
 		Personal=personnel,staff	#several meanings possible
+		#english-german/spanish		#comments with '#' (must be the first character in the line)
 		german=deutsch,alemán		#many languages possible (ISO 8859-15)
 		to fit=caber			#spaces possible
 	See also the vocabulary file "example.txt"
