@@ -52,9 +52,10 @@ One point is that you can use it with different languages.
 	
 	Optional arguments:
 		-h		Show help
-		-r		Random order of the words
+		-r		Random order of words
 		-d1		Program asks the first word
 		-d2		Program asks the second word
+		-dr		Program sets direction randomly
 		-n <num>	ask <num> words
 		-c		case-sensitivity
 
@@ -62,7 +63,7 @@ One point is that you can use it with different languages.
 	The program asks you for the word on the right side in the file.
 	(when you set -d2, it asks you for the left one)
 	You have to type the word from the right side.
-	Be careful with the spelling! You have two tries, e.g. if you mispelled a word.
+	Be careful with the spelling! You have two tries, e.g. if you misspelled a word.
 	At the end it shows you an analysis (correct words in percent).
 
 =============================================================================
