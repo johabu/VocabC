@@ -8,7 +8,7 @@
 #include <time.h>
 #define MAX_WORDS 5
 #define MAX_TRIES 2
-#define MAX_LENGTH 150
+#define MAX_LENGTH 200
 
 FILE *vocabfile;
 FILE *sourcefile;
@@ -36,14 +36,20 @@ int main(int argc, char **argv) {
 	int CHAR;
 	opterr = 0;
 	//variables for query and output
-	char buffer[MAX_LENGTH];
-	char lang1_word[MAX_LENGTH], source_str[MAX_LENGTH], input_str[MAX_LENGTH], line[MAX_LENGTH], temp[MAX_LENGTH], temp_word[MAX_LENGTH];
+	char buffer[MAX_LENGTH], source_str[MAX_LENGTH], input_str[MAX_LENGTH];
+	char comm_str[MAX_LENGTH], lang1_comm[MAX_LENGTH], lang2_comm[MAX_LENGTH];
+	char lang1_word[MAX_LENGTH], lang1_str[MAX_LENGTH], lang2_str[MAX_LENGTH];
+	char line[MAX_LENGTH], temp[MAX_LENGTH], temp_word[MAX_LENGTH], lang2_temp_str[MAX_LENGTH];
 	char lang2_word[MAX_WORDS][MAX_LENGTH];
 	char *ptr;
-	char token[] = "=,\n";
+	//different tokens for dividing strings
+	char lang_token[] = "=\n";
+	char word_token[] = ",";
+	char comm_token[] = "#";
 	int pairs = 0, pair = 1;
 	int lines = 0;
 	int word = 0;
+	//loop variables
 	int i,j;
 	int k = 0;
 	int is_giv;
@@ -51,6 +57,7 @@ int main(int argc, char **argv) {
 	int right = 0, correct = 0, tries = 0;
 	char direction[2] = "1";
 	float percent;
+	//variables for bar
 	float bar_num;
 	float bar_loop;
 
@@ -151,6 +158,10 @@ int main(int argc, char **argv) {
 	printf("Word pairs: %d\n",pairs);
 	//main loop with query
 	for (i = 0; i < pairs; i++) {
+		strcpy(comm_str,"NULL");
+		strcpy(lang1_comm,"NULL");
+		strcpy(lang2_comm,"NULL");
+		strcpy(lang2_temp_str,"NULL");
 		strcpy(temp_word,"NULL");
 		strcpy(lang1_word,"NULL");
 		for (j = 0; j < MAX_WORDS; j++) {
@@ -166,12 +177,35 @@ int main(int argc, char **argv) {
 		//read line i
 		if (fgets(source_str, MAX_LENGTH, vocabfile) == NULL)
 			Error(3);
-		//save lang1_word
-		ptr = strtok(source_str,token);
+		//divide into lang1 and lang2
+		ptr = strtok(source_str,lang_token);
+		strcpy(lang1_str,ptr);
+		ptr = strtok(NULL,lang_token);
+		strcpy(lang2_str,ptr);
+		//divide lang1 into word and comment
+		ptr = strtok(lang1_str,comm_token);
 		strcpy(lang1_word,ptr);
-		//save following words in lang2_word[]
 		while (ptr != NULL) {
-			ptr = strtok(NULL,token);
+			ptr = strtok(NULL,comm_token);
+			if (ptr != NULL) {
+				strcpy(lang1_comm,ptr);
+			}
+		}
+		//divide lang2 into words and comment
+		ptr = strtok(lang2_str,comm_token);
+		strcpy(lang2_temp_str,ptr);
+		while (ptr != NULL) {
+			ptr = strtok(NULL,comm_token);
+			if (ptr != NULL) {
+				strcpy(lang2_comm,ptr);
+			}
+		}
+		//save words of second language in lang2_word[]
+		ptr = strtok(lang2_temp_str,word_token);
+		strcpy(lang2_word[0],ptr);
+		word = 1;
+		while (ptr != NULL) {
+			ptr = strtok(NULL,word_token);
 			if (ptr != NULL) {
 				strcpy(lang2_word[word],ptr);
 			}
@@ -213,13 +247,45 @@ int main(int argc, char **argv) {
 			for (bar_loop=1; bar_loop<=10; bar_loop++) {
 				(bar_loop<=bar_num) ? printf("=") : printf(" ");
 			}
-			printf("]  :?:  %s\n>>>  ",lang1_word);
+			//is lang1_comm or lang2_comm not "NULL"?
+			if ((strcmp(lang1_comm,"NULL") != 0) && (strcmp(direction,"1") == 0)) {
+				strcpy(comm_str,lang1_comm);
+			}
+			if ((strcmp(lang2_comm,"NULL") != 0) && (strcmp(direction,"2") == 0)) {
+				strcpy(comm_str,lang2_comm);
+			}
+			//ask for a word and print the comment (if one exists)
+			if (strcmp(comm_str, "NULL") != 0) {
+				printf("]  ?:  \"%s\"\t#: %s\n>>>  ",lang1_word,comm_str);
+			} else {
+				printf("]  ?:  \"%s\"\n>>>  ",lang1_word);
+			}
 			//user gives answer
 			if(fgets(input_str, MAX_LENGTH, stdin) == NULL) {
 				Error(4);
 			}
 			//removing '\n'
 			input_str[strlen(input_str)-1] = '\0';
+			//remove " " at the end of input
+			while (input_str[strlen(input_str)-1] == ' ' || input_str[strlen(input_str)-1] == '\t') {
+				input_str[strlen(input_str)-1] = '\0';
+			}
+			//remove " " at the end of word for which is asked
+			while (lang1_word[strlen(lang1_word)-1] == ' ' || lang1_word[strlen(lang1_word)-1] == '\t') {
+				lang1_word[strlen(lang1_word)-1] = '\0';
+			}
+			//remove " " at the beginning of input
+			while (input_str[0] == ' ' || input_str[0] == '\t') {
+				for (j = 0; j < strlen(input_str); j++) {
+					input_str[j] = input_str[j+1];
+				}
+			}
+			//remove " " at the beginning of word for which is asked
+			while (lang1_word[0] == ' ' || lang1_word[0] == '\t') {
+				for (j = 0; j < strlen(lang1_word); j++) {
+					lang1_word[j] = lang1_word[j+1];
+				}
+			}
 			//is any of the meanings equal to the user`s answer?
 			if (strcmp(direction,"2") != 0) {
 				for (j = 0; j < 5; j++) {
@@ -254,7 +320,11 @@ int main(int argc, char **argv) {
 		}
 		//too many tries? -> next word
 		if (correct != 1) {
-			printf("\tCorrect was: \"%s\"",lang2_word[0]);
+			if (strcmp(direction,"2") != 0) {
+				printf("\tCorrect was: \"%s\"",lang2_word[0]);
+			} else {
+				printf("\tCorrect was: \"%s\"",lang2_word[k]);
+			}
 		}
 		printf("\n");
 		pair++;

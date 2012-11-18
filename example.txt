@@ -1,4 +1,4 @@
-Personal=personnel,staff
+Personal#comment1=personnel,staff#comment2
 #comment
 german=deutsch,alemán
 spanish=español,spanisch
