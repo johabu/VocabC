@@ -1,7 +1,7 @@
 Personal#comment1=personnel,staff#comment2
 #comment
-german=deutsch,alemán
-spanish=español,spanisch
+german=deutsch, alemán
+spanish=español, spanisch
 Guten Tag=Good day
 brother=frère
 example=esempio

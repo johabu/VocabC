@@ -17,14 +17,13 @@
 
 ===================================README====================================
 
-version 1.4 is tested on Linux.
 version 1.5 is tested on Linux.
-version 1.6 is tested on Linux.
-
+version 1.6 is tested on Linux x86-64.
+version 1.7 is tested on Linux x86-64.
 ===========================Download and installing===========================
 
-First download the file (VocabC.zip or VocabC.tar.gz) or clone the repository
-and extract the files.
+First download the file (VocabC.zip or VocabC.tar.gz) and extract the files
+or clone the repository
 
 Linux:
 	Type the following commands in a shell:
@@ -47,11 +46,13 @@ One point is that you can use it with different languages.
 		Personal=personnel,staff	#several meanings possible
 		#english-german/spanish		#comments with '#' (must be the first character in the line)
 		german=deutsch,alemán		#many languages possible (ISO 8859-15)
-		to fit=caber			#spaces possible
+		to fit=caber#in english		#spaces possible; comments for one side possible
 	See also the vocabulary file "example.txt"
 
 2)	Start the program:
-	type:	VocabC -f <file>
+	type:	VocabC -f <file>	
+		If this doesn't work, try ./VocabC <options> in the directory in which you installed the program.
+		Check also your PATH variable.
 	
 	Optional arguments:
 		-h		Show help
