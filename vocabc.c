@@ -15,6 +15,7 @@ FILE *sourcefile;
 
 char *errors[] = {"VocabC requires argument -f <file>","Error in opening vocabulary file","too high argument of option -n","Error in reading vocabulary file",
 			"Error in input","Error in deleting temporary file","Unable to clear screen","Internal Error"};
+int init(void);
 
 int Error(int error) {
 	printf("Error %d - %s!\n",error,errors[error]);
@@ -32,7 +33,9 @@ int main(int argc, char **argv) {
 	char *dvalue = "1";
 	char *nvalue = "all";
 	int rvalue = 0;
-	int cvalue = 0;
+	int svalue = 0;
+	int cvalue = 1;
+	int ivalue = 0;
 	int CHAR;
 	opterr = 0;
 	//variables for query and output
@@ -64,7 +67,10 @@ int main(int argc, char **argv) {
 	if (argc < 2) {
 		Error(0);
 	}
-	while ((CHAR = getopt (argc, argv, "hrf:d:n:c")) != -1) {
+	
+	
+	
+	while ((CHAR = getopt (argc, argv, "hrf:d:n:sci")) != -1) {
 		switch (CHAR) {
           		case 'h':
 				printf("\nVocabC v1.7\n");
@@ -72,7 +78,8 @@ int main(int argc, char **argv) {
 				printf("\nOptional arguments:\n-h\tShow this help\n-r\tRandomize the order of the words\n");
 				printf("-d1\tThe program asks the first word\n-d2\tThe program asks the second word\n-dr\tthe program asks randomly\n");
 				printf("-n <num>\tAsk only <num> words\n");
-				printf("-c\tCase sensitive\n");
+				printf("-s\tCase sensitive\n");
+				printf("-c\tdon't display comments\n");
 				return EXIT_FAILURE;	
             		case 'f':
 				fvalue = optarg;
@@ -86,8 +93,14 @@ int main(int argc, char **argv) {
 			case 'n':
 				nvalue = optarg;
 				break;
+			case 's':
+				svalue = 1;
+				break;
 			case 'c':
-				cvalue = 1;
+				cvalue = 0;
+				break;
+			case 'i':
+				ivalue = 1;
 				break;
            		case '?':
              			if (optopt == 'f' || optopt == 'd') {
@@ -103,6 +116,10 @@ int main(int argc, char **argv) {
            		default:
              			return EXIT_FAILURE;
            	}
+	}
+	// if -i, execute init()
+	if (ivalue == 1) {
+		init();
 	}
 	//Clear screen
 	if (system("clear") == -1) {
@@ -289,7 +306,7 @@ int main(int argc, char **argv) {
 			//is any of the meanings equal to the user`s answer?
 			if (strcmp(direction,"2") != 0) {
 				for (j = 0; j < 5; j++) {
-					if (cvalue == 1) {
+					if (svalue == 1) {
 						if (strcmp(lang2_word[j], input_str) == 0) {
 							correct = 1;
 						}
@@ -310,6 +327,7 @@ int main(int argc, char **argv) {
 					}
 				}
 			}
+			
 			//display "correct" or "wrong"
 			if (correct == 1) {
 				printf("Correct!\n");
@@ -338,4 +356,39 @@ int main(int argc, char **argv) {
 		Error(5);
 	}
        	return EXIT_SUCCESS;
+}
+
+int init(void) {
+	FILE *configfile;
+	FILE *config_source;
+	char buf[1024];
+	char *conf_dir;
+	printf("\nVocabC init function\n\nGetting HOME variable ... ");
+	conf_dir = getenv("HOME");
+	if (conf_dir == NULL) {
+		printf("Error.\n");
+		exit(EXIT_SUCCESS);
+	}
+	printf("OK.\n");
+	strncat(conf_dir,"/.config/vocabc/config",100);
+	printf("Open config file ... ");
+	configfile = fopen(conf_dir,"a+");
+	if (configfile == NULL) {
+		printf("Error.\n\n");
+		exit(EXIT_FAILURE);
+	}
+	printf("OK.\nOpen settings source file ... ");
+	config_source = fopen("conf.txt","r+");
+	if (config_source == NULL) {
+		printf("Error.\n\n");
+		exit(EXIT_FAILURE);
+	}
+	printf("OK.\nCopy settings into config file ... ");
+	while((fgets(buf, sizeof(buf), config_source)) != NULL) {
+		fputs(buf, configfile);
+	}
+	fclose(config_source);
+	fclose(configfile);
+	printf("Done.\n\nInitialisation completed.\nConfiguration file is '%s'\n\n",conf_dir);
+	exit(EXIT_SUCCESS);
 }

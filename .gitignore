@@ -1,4 +1,5 @@
 VocabC
 *.txt
+*.log
 !GNU_GPL.txt
 !example.txt
