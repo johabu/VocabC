@@ -1,5 +1,5 @@
 =============================================================================
-	VocabC.c
+	VocabC
 	Developed by Johabu <http://johabu.spheniscida.de>
 	
 	This file is part of VocabC.

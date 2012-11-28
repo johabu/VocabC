@@ -3,3 +3,4 @@ VocabC
 *.log
 !GNU_GPL.txt
 !example.txt
+!conf.txt

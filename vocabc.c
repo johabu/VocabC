@@ -1,4 +1,4 @@
-// #####	VocabC v1.7	##### //
+// #####	VocabC v2.0	##### //
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -8,10 +8,12 @@
 #include <time.h>
 #define MAX_WORDS 5
 #define MAX_TRIES 2
-#define MAX_LENGTH 200
+#define MAX_LENGTH 1024
+#define VERSION "2.0"
 
 FILE *vocabfile;
 FILE *sourcefile;
+FILE *config;
 
 char *errors[] = {"VocabC requires argument -f <file>","Error in opening vocabulary file","too high argument of option -n","Error in reading vocabulary file",
 			"Error in input","Error in deleting temporary file","Unable to clear screen","Internal Error"};
@@ -40,11 +42,13 @@ int main(int argc, char **argv) {
 	opterr = 0;
 	//variables for query and output
 	char buffer[MAX_LENGTH], source_str[MAX_LENGTH], input_str[MAX_LENGTH];
+	char settings[10][MAX_LENGTH];
 	char comm_str[MAX_LENGTH], lang1_comm[MAX_LENGTH], lang2_comm[MAX_LENGTH];
 	char lang1_word[MAX_LENGTH], lang1_str[MAX_LENGTH], lang2_str[MAX_LENGTH];
 	char line[MAX_LENGTH], temp[MAX_LENGTH], temp_word[MAX_LENGTH], lang2_temp_str[MAX_LENGTH];
 	char lang2_word[MAX_WORDS][MAX_LENGTH];
 	char *ptr;
+	char setting[MAX_LENGTH];
 	//different tokens for dividing strings
 	char lang_token[] = "=\n";
 	char word_token[] = ",";
@@ -67,13 +71,90 @@ int main(int argc, char **argv) {
 	if (argc < 2) {
 		Error(0);
 	}
-	
-	
-	
+	//Should the init-function be executed?
+	if (strcmp(argv[1],"-i") == 0) {
+		init();
+	}
+	//get the HOME variable to locate the config file
+	char *conf_dir;
+	conf_dir = getenv("HOME");
+	if (conf_dir == NULL) {
+		printf("Error.\n");
+		exit(EXIT_SUCCESS);
+	}
+	strncat(conf_dir,"/.config/vocabc/config",100);
+	//open config file
+	config = fopen(conf_dir,"r");
+	if (config == NULL) {
+		printf("\nUnable to open configuration file. Try VocabC -i to fix the problem.\n");
+	}
+	for (i = 0; i < 10; i++) {
+		strcpy(settings[i],"NULL");
+	}
+	i = 0;
+	j = 0;
+	//read config file and store settings in strings
+	while ((fgets(setting, sizeof(setting), config)) != NULL && (i < 10)) {
+		if (setting[0] != '#') {
+			strcpy(settings[i],setting);
+			j++;
+		}
+		settings[i][strlen(settings[i])-1] = '\0';
+		i = j;
+	}
+	//is 'random = true' set in the config file?
+	for (i = 0; i < 9; i++) {
+		if (strncmp(settings[i],"random = ",9) == 0) {
+			if (strstr(settings[i],"true") != NULL) {
+				rvalue = 1;
+			}
+		}
+	}
+	//which value has 'direction' in the config file?
+	for (i = 0; i < 9; i++) {
+		if (strncmp(settings[i],"direction = ",12) == 0) {
+			if (settings[i][13] == '1') {
+				strcpy(dvalue,"1");
+			} else if (settings[i][13] == '2') {
+				strcpy(dvalue,"2");
+			} else if (settings[i][13] == 'r') {
+				strcpy(dvalue,"r");
+			}
+		}
+	}
+	//How many words should be asked?
+	for (i = 0; i < 9; i++) {
+		if (strncmp(settings[i],"pairs = ",8) == 0) {
+			if (strstr(settings[i],"all") != NULL) {
+				strcpy(nvalue,"all");
+			} else {
+				ptr = strtok(settings[i], "=");
+				ptr = strtok(NULL, "=");
+				strcpy(nvalue,ptr);
+				while (nvalue[0] == ' ') {
+					for (j = 0; j < strlen(nvalue); j++) {
+						nvalue[j] = nvalue[j+1];
+					}
+				}
+				while (nvalue[strlen(nvalue)-1] == ' ') {
+					nvalue[strlen(nvalue)-1] = '\0';
+				}
+			}
+		}
+	}
+	//is case sensitivity set to 'true' in the config file?
+	for (i = 0; i < 9; i++) {
+		if (strncmp(settings[i],"sensitivity = ",14) == 0) {
+			if (strstr(settings[i],"true") != NULL) {
+				svalue = 1;
+			}
+		}
+	}
+
 	while ((CHAR = getopt (argc, argv, "hrf:d:n:sci")) != -1) {
 		switch (CHAR) {
           		case 'h':
-				printf("\nVocabC v1.7\n");
+				printf("\nVocabC v%s\n",VERSION);
             			printf("\nUse:\tVocabC -f <file>\n");
 				printf("\nOptional arguments:\n-h\tShow this help\n-r\tRandomize the order of the words\n");
 				printf("-d1\tThe program asks the first word\n-d2\tThe program asks the second word\n-dr\tthe program asks randomly\n");
@@ -172,7 +253,19 @@ int main(int argc, char **argv) {
 	if (pairs > lines) {
 		Error(2);
 	}
-	printf("Word pairs: %d\n",pairs);
+	printf("----------------------------------------------------------------------\n");
+	printf("VocabC - version %s   Developed by Johabu <https://github.com/johabu>\n\nStatus:\n",VERSION);
+	if (rvalue == 1) { printf("Random order set\n"); }
+	if (svalue == 1) { printf("Case sensitivity set\n"); }
+	printf("Direction: ");
+	if (strcmp(dvalue,"r") == 0) {
+		printf("both\n");
+	} else {
+		printf("%s\n",dvalue);
+	}
+	if (cvalue == 1) { printf("Comments will be displayed\n"); }
+	printf("%d pairs will be asked.\n",pairs);
+	printf("----------------------------------------------------------------------\n\n");
 	//main loop with query
 	for (i = 0; i < pairs; i++) {
 		strcpy(comm_str,"NULL");
@@ -363,13 +456,14 @@ int init(void) {
 	FILE *config_source;
 	char buf[1024];
 	char *conf_dir;
+	printf("\n---------------------------------------------------------------------");
 	printf("\nVocabC init function\n\nGetting HOME variable ... ");
 	conf_dir = getenv("HOME");
 	if (conf_dir == NULL) {
 		printf("Error.\n");
 		exit(EXIT_SUCCESS);
 	}
-	printf("OK.\n");
+	printf("OK.\nHome is '%s'\n\n",conf_dir);
 	strncat(conf_dir,"/.config/vocabc/config",100);
 	printf("Open config file ... ");
 	configfile = fopen(conf_dir,"a+");
@@ -377,18 +471,21 @@ int init(void) {
 		printf("Error.\n\n");
 		exit(EXIT_FAILURE);
 	}
-	printf("OK.\nOpen settings source file ... ");
+	printf("OK.\n\nOpen settings source file ... ");
 	config_source = fopen("conf.txt","r+");
 	if (config_source == NULL) {
 		printf("Error.\n\n");
 		exit(EXIT_FAILURE);
 	}
-	printf("OK.\nCopy settings into config file ... ");
+	printf("OK.\n\nCopy settings into config file ... ");
 	while((fgets(buf, sizeof(buf), config_source)) != NULL) {
 		fputs(buf, configfile);
 	}
 	fclose(config_source);
 	fclose(configfile);
-	printf("Done.\n\nInitialisation completed.\nConfiguration file is '%s'\n\n",conf_dir);
+	printf("Done.\n\n");
+	printf("----------------------------------------------------------------------");
+	printf("\nInitialisation completed.\nConfiguration file is '%s'\nChange default settings by editing this file\n",conf_dir);
+	printf("----------------------------------------------------------------------\n");
 	exit(EXIT_SUCCESS);
 }
