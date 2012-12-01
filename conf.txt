@@ -1,14 +1,17 @@
 #VocabC config file
 #
-#Random order: Set to "true", if words should be randomly asked by default
+#Random order: Set to "true", if words should be randomly asked by default.
 random = true
 #
-#Direction: Set to "1" or to "2", if program should ask you for the second / the first language
-#Set to "r", to choose direction randomly for each word pair
+#Direction: Set to "1" or to "2", if program should ask you for the second / the first language.
+#Set to "r", to choose direction randomly for each word pair.
 direction = 1
 #
-#Word pairs: "All" to ask all word pairs of a file by default, or number >0
+#Word pairs: "All" to ask all word pairs of a file by default, or number >0.
 pairs = all
 #
-#Case sensitivity: set to "true" to set case sensitivity by default, or to "false"
+#Case sensitivity: set to "true" to set case sensitivity by default, or to "false".
 sensitivity = false
+#
+#Comments: set to "true" to display comments during the query of words. Otherwise set to "false".
+comments = true

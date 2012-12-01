@@ -17,21 +17,30 @@
 
 ===================================README====================================
 
-version 1.5 is tested on Linux.
 version 1.6 is tested on Linux x86-64.
 version 1.7 is tested on Linux x86-64.
+version 2.0 is tested on Linux x86-64.
+
 ===========================Download and installing===========================
 
 First download the file (VocabC.zip or VocabC.tar.gz) and extract the files
 or clone the repository
 
-Linux:
-	Type the following commands in a shell:
-		cd /PATH/TO/VocabC/
-		make install (sudo rights required)
-Windows:
-	Compile the files, e.g. with your Visual Studio Express or a Intel C/C++
-	compiler.
+Compiling:
+	Linux:
+		Type the following commands in a shell:
+			cd /PATH/TO/VocabC/
+			make install
+	Windows:
+		Compile the files, e.g. with your Visual Studio Express or a Intel C/C++
+		compiler.
+
+Configuration:
+	When running 'make install' the program creates an config file
+	located in HOME/.config/vocabc/ . If not, copy "conf.txt" in this
+	directory and rename it into "config".
+	In the config file you can save your default settings, e.g. random
+	order by default. Look at this file to see which settings you can save.
 
 =====================================Use=====================================
 
@@ -61,10 +70,13 @@ One point is that you can use it with different languages.
 		-dr		Program sets direction randomly
 		-n <num>	ask <num> words
 		-s		case-sensitivity
+	
+	If you stored settings in a configuration file, you don't need to set optional arguments.
+	If you set some, settings from the configuration file are overwritten.
 
 3)	Use:
 	The program asks you for the word on the right side in the file.
-	(when you set -d2, it asks you for the left one)
+	(when you set -d2 (-dr) , it asks you (maybe) for the left one)
 	You have to type the word from the right side.
 	Be careful with the spelling! You have two tries, e.g. if you misspelled a word.
 	At the end it shows you an analysis (correct words in percent).

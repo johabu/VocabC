@@ -53,15 +53,15 @@ int main(int argc, char **argv) {
 	char lang_token[] = "=\n";
 	char word_token[] = ",";
 	char comm_token[] = "#";
-	int pairs = 0, pair = 1;
-	int lines = 0;
-	int word = 0;
+	unsigned int pairs = 0, pair = 1;
+	unsigned int lines = 0;
+	unsigned int word = 0;
 	//loop variables
-	int i,j;
-	int k = 0;
+	unsigned int i,j;
+	unsigned int k = 0;
 	int is_giv;
 	int index_a, index_b, temp_rand;
-	int right = 0, correct = 0, tries = 0;
+	unsigned int right = 0, correct = 0, tries = 0;
 	char direction[2] = "1";
 	float percent;
 	//variables for bar
@@ -150,6 +150,14 @@ int main(int argc, char **argv) {
 			}
 		}
 	}
+	//are comments allowed?
+	for (i = 0; i < 9; i++) {
+		if (strncmp(settings[i],"comments = ",11) == 0) {
+			if (strstr(settings[i],"true") != NULL) {
+				cvalue = 1;
+			}
+		}
+	}
 
 	while ((CHAR = getopt (argc, argv, "hrf:d:n:sci")) != -1) {
 		switch (CHAR) {
@@ -227,7 +235,7 @@ int main(int argc, char **argv) {
 		lines++;
 	}
 	srand(time(NULL));
-	int rand_lines[lines-1];
+	unsigned int rand_lines[lines-1];
 	//fill array with line numbers
 	for(i = 0; i < lines; i++) {
 		rand_lines[i] = i+1;
@@ -466,7 +474,7 @@ int init(void) {
 	printf("OK.\nHome is '%s'\n\n",conf_dir);
 	strncat(conf_dir,"/.config/vocabc/config",100);
 	printf("Open config file ... ");
-	configfile = fopen(conf_dir,"a+");
+	configfile = fopen(conf_dir,"w+");
 	if (configfile == NULL) {
 		printf("Error.\n\n");
 		exit(EXIT_FAILURE);
