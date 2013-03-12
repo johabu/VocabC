@@ -1,9 +1,9 @@
 Personal#comment1=personnel,staff#comment2
 #comment
-german=deutsch, alemán
-spanish=español, spanisch
-Guten Tag=Good day
-brother=frère
-example=esempio
-money=Geld
-to fit=caber
+german		=deutsch, alemán
+spanish		=español, spanisch
+Guten Tag	=Good day
+brother		=frère
+example		=esempio
+money		=Geld
+to fit		=caber

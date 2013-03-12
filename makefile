@@ -3,9 +3,12 @@ CFLAGS = -W -Wall -O2
 BINDIR = /usr/local/bin
 NAME = VocabC
 
+localinstall: 
+	mkdir -p ~/.config/vocabc
+	$(CC) $(CFLAGS) -o $(NAME) vocabc.c
+	./$(NAME) -i
 install: 
 	mkdir -p ~/.config/vocabc
-	rm -f ~/.config/vocabc/config
 	$(CC) $(CFLAGS) -o $(NAME) vocabc.c
 	sudo cp $(NAME) $(BINDIR)
 	$(NAME) -i

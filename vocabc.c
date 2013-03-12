@@ -9,35 +9,38 @@
 #define MAX_WORDS 5
 #define MAX_TRIES 2
 #define MAX_LENGTH 1024
-#define VERSION "2.0"
+#define VERSION "2.1beta"
+
 
 FILE *vocabfile;
 FILE *sourcefile;
 FILE *config;
+int glo_var;
 
 char *errors[] = {"VocabC requires argument -f <file>","Error in opening vocabulary file","too high argument of option -n","Error in reading vocabulary file",
-			"Error in input","Error in deleting temporary file","Unable to clear screen","Internal Error"};
+			"Error in input","Error in deleting temporary file","Unable to clear screen","Internal Error","","Unable to read $HOME"};
 int init(void);
 
 int Error(int error) {
-	printf("Error %d - %s!\n",error,errors[error]);
+	if (error == 8) {
+		printf("Error 8 - Vocabfile doesn't contain a word pair at line %d!\n",glo_var);
+	} else {
+		printf("Error %d - %s!\n",error,errors[error]);
+	}
 	if (remove("vocab.tmp") < 0) {
 		fclose(vocabfile);
 		remove("vocab.tmp");
 	}
+	printf("Press 'Enter' to exit...\n");
+	getchar();
 	exit(EXIT_FAILURE);
 }
 
 
 int main(int argc, char **argv) {
 	//variables for getopt
-	char *fvalue = NULL;
-	char *dvalue = "1";
-	char *nvalue = "all";
-	int rvalue = 0;
-	int svalue = 0;
-	int cvalue = 1;
-	int ivalue = 0;
+	char *fvalue = NULL, *dvalue = "1", *nvalue = "all";
+	int rvalue = 0, svalue = 0, ivalue = 0, cvalue = 1;
 	int CHAR;
 	opterr = 0;
 	//variables for query and output
@@ -50,23 +53,16 @@ int main(int argc, char **argv) {
 	char *ptr;
 	char setting[MAX_LENGTH];
 	//different tokens for dividing strings
-	char lang_token[] = "=\n";
-	char word_token[] = ",";
-	char comm_token[] = "#";
-	unsigned int pairs = 0, pair = 1;
-	unsigned int lines = 0;
-	unsigned int word = 0;
+	char lang_token[] = "=\n", word_token[] = ",", comm_token[] = "#";
+	unsigned int pairs = 0, pair = 1, lines = 0, word = 0;
 	//loop variables
-	unsigned int i,j;
-	unsigned int k = 0;
-	int is_giv;
-	int index_a, index_b, temp_rand;
+	unsigned int i, j, l, k = 0;
+	int is_giv, index_a, index_b, temp_rand;
 	unsigned int right = 0, correct = 0, tries = 0;
 	char direction[2] = "1";
 	float percent;
 	//variables for bar
-	float bar_num;
-	float bar_loop;
+	float bar_num, bar_loop;
 
 	if (argc < 2) {
 		Error(0);
@@ -74,33 +70,37 @@ int main(int argc, char **argv) {
 	//Should the init-function be executed?
 	if (strcmp(argv[1],"-i") == 0) {
 		init();
+	} else {
+		if (system("clear") == -1) {
+			Error(6);
+		}
 	}
 	//get the HOME variable to locate the config file
 	char *conf_dir;
 	conf_dir = getenv("HOME");
 	if (conf_dir == NULL) {
-		printf("Error.\n");
-		exit(EXIT_SUCCESS);
+		Error(9);
 	}
 	strncat(conf_dir,"/.config/vocabc/config",100);
 	//open config file
 	config = fopen(conf_dir,"r");
 	if (config == NULL) {
 		printf("\nUnable to open configuration file. Try VocabC -i to fix the problem.\n");
-	}
-	for (i = 0; i < 10; i++) {
-		strcpy(settings[i],"NULL");
-	}
-	i = 0;
-	j = 0;
-	//read config file and store settings in strings
-	while ((fgets(setting, sizeof(setting), config)) != NULL && (i < 10)) {
-		if (setting[0] != '#') {
-			strcpy(settings[i],setting);
-			j++;
+	} else {
+		for (i = 0; i < 10; i++) {
+			strcpy(settings[i],"NULL");
 		}
-		settings[i][strlen(settings[i])-1] = '\0';
-		i = j;
+		i = 0;
+		j = 0;
+		//read config file and store settings in strings
+		while ((fgets(setting, sizeof(setting), config) != NULL) && (i < 10)) {
+			if (setting[0] != '#') {
+				strcpy(settings[i],setting);
+				j++;
+			}
+			settings[i][strlen(settings[i])-1] = '\0';
+			i = j;
+		}
 	}
 	//is 'random = true' set in the config file?
 	for (i = 0; i < 9; i++) {
@@ -193,14 +193,14 @@ int main(int argc, char **argv) {
 				break;
            		case '?':
              			if (optopt == 'f' || optopt == 'd') {
-               				fprintf (stderr, "Error - Option -%c requires an argument.\n", optopt);
-					return EXIT_FAILURE;
+               				fprintf (stderr, "Error - Option -%c requires an argument.\nPress 'Enter' to exit...\n", optopt);
+					getchar();
              			} else if (isprint (optopt)) {
-               				fprintf (stderr, "Error - Unknown option `-%c'.\n", optopt);
-					return EXIT_FAILURE;
+               				fprintf (stderr, "Error - Unknown option `-%c'.\nPress 'Enter' to exit...\n", optopt);
+					getchar();
              			} else {
-               				fprintf (stderr,"Error - Unknown option character `\\x%x'.\n",optopt);
-             				return EXIT_FAILURE;
+               				fprintf (stderr,"Error - Unknown option character `\\x%x'.\nPress 'Enter' to exit...\n",optopt);
+             				getchar();
 				}
            		default:
              			return EXIT_FAILURE;
@@ -210,19 +210,21 @@ int main(int argc, char **argv) {
 	if (ivalue == 1) {
 		init();
 	}
-	//Clear screen
-	if (system("clear") == -1) {
-		Error(6);
-	}
 	//Open vocabulary file
 	sourcefile = fopen(fvalue,"r");
 	vocabfile = fopen("vocab.tmp","w");
 	if (NULL == vocabfile || NULL == sourcefile) {
 		Error(1);
 	}
+	lines = 0;
 	//copy lines from source to temporary file
 	while((fgets(buffer, sizeof(buffer), sourcefile)) != NULL) {
+		lines++;
 		if (buffer[0] != '#') {
+			if (strchr(buffer,'=') == NULL) {
+				glo_var = lines;
+				Error(8);
+			}
 			fputs(buffer, vocabfile);
 		}
 	}
@@ -231,6 +233,7 @@ int main(int argc, char **argv) {
 		Error(7);
 	}
 	//Count lines
+	lines = 0;
 	while ((fgets(line,MAX_LENGTH,vocabfile)) != NULL) {
 		lines++;
 	}
@@ -261,6 +264,7 @@ int main(int argc, char **argv) {
 	if (pairs > lines) {
 		Error(2);
 	}
+	//First output of the program - options which set are displayed
 	printf("----------------------------------------------------------------------\n");
 	printf("VocabC - version %s   Developed by Johabu <https://github.com/johabu>\n\nStatus:\n",VERSION);
 	if (rvalue == 1) { printf("Random order set\n"); }
@@ -357,13 +361,47 @@ int main(int argc, char **argv) {
 		}
 		correct = 0;
 		tries = 0;
+		//query of one word
 		while (tries < MAX_TRIES && correct != 1) {
 			tries++;
+			//remove " " at the end of word for which is asked
+			while (lang1_word[strlen(lang1_word)-1] == ' ' || lang1_word[strlen(lang1_word)-1] == '\t') {
+				lang1_word[strlen(lang1_word)-1] = '\0';
+			}
+			//remove " " at the end of all meanings
+			for (j = 0; j < MAX_WORDS; j++) {
+				while(lang2_word[j][strlen(lang2_word[j])-1] == ' ' || lang2_word[j][strlen(lang2_word[j])-1] == '\t') {
+					lang2_word[j][strlen(lang2_word[j])-1] = '\0';
+					}
+			}
+			//remove " " at the beginning of word for which is asked
+			while (lang1_word[0] == ' ' || lang1_word[0] == '\t') {
+				for (j = 0; j < strlen(lang1_word); j++) {
+					lang1_word[j] = lang1_word[j+1];
+				}
+			}
+			//remove " " at the beginning of all meanings
+			for (j = 0; j < MAX_WORDS; j++) {
+				while (lang2_word[j][0] == ' ' || lang2_word[j][0] == '\t') {
+					for (l = 0; l < strlen(lang2_word[j]); l++) {
+						lang2_word[j][l] = lang2_word[j][l+1];
+					}
+				}
+			}
 			//ask user a word
-			printf("\n(%d/%d)\t[", pair, pairs);
-			bar_num = (float) pair / (float) pairs * 10;
-			for (bar_loop=1; bar_loop<=10; bar_loop++) {
-				(bar_loop<=bar_num) ? printf("=") : printf(" ");
+			if (pair == 1) {
+				percent = 0;
+			} else {
+				percent = (float) right / (float) (pair-1) * 100;
+			}
+			printf("\n\n");
+			if (tries == 1) {
+				printf("|| word %d of %d || known: %g%% || progress: [", pair, pairs, percent);
+				bar_num = (float) pair / (float) pairs * 10;
+				for (bar_loop=1; bar_loop<=10; bar_loop++) {
+					(bar_loop<=bar_num) ? printf("=") : printf(" ");
+				}
+				printf("] ||\n");
 			}
 			//is lang1_comm or lang2_comm not "NULL"?
 			if ((strcmp(lang1_comm,"NULL") != 0) && (strcmp(direction,"1") == 0)) {
@@ -374,9 +412,9 @@ int main(int argc, char **argv) {
 			}
 			//ask for a word and print the comment (if one exists)
 			if (strcmp(comm_str, "NULL") != 0) {
-				printf("]  ?:  \"%s\"\t#: %s\n>>>  ",lang1_word,comm_str);
+				printf("word:  \"%s\"\t#: %s\n>>>  ",lang1_word,comm_str);
 			} else {
-				printf("]  ?:  \"%s\"\n>>>  ",lang1_word);
+				printf("word:  \"%s\"\n>>>  ",lang1_word);
 			}
 			//user gives answer
 			if(fgets(input_str, MAX_LENGTH, stdin) == NULL) {
@@ -388,22 +426,13 @@ int main(int argc, char **argv) {
 			while (input_str[strlen(input_str)-1] == ' ' || input_str[strlen(input_str)-1] == '\t') {
 				input_str[strlen(input_str)-1] = '\0';
 			}
-			//remove " " at the end of word for which is asked
-			while (lang1_word[strlen(lang1_word)-1] == ' ' || lang1_word[strlen(lang1_word)-1] == '\t') {
-				lang1_word[strlen(lang1_word)-1] = '\0';
-			}
 			//remove " " at the beginning of input
 			while (input_str[0] == ' ' || input_str[0] == '\t') {
 				for (j = 0; j < strlen(input_str); j++) {
 					input_str[j] = input_str[j+1];
 				}
 			}
-			//remove " " at the beginning of word for which is asked
-			while (lang1_word[0] == ' ' || lang1_word[0] == '\t') {
-				for (j = 0; j < strlen(lang1_word); j++) {
-					lang1_word[j] = lang1_word[j+1];
-				}
-			}
+
 			//is any of the meanings equal to the user`s answer?
 			if (strcmp(direction,"2") != 0) {
 				for (j = 0; j < 5; j++) {
@@ -431,7 +460,7 @@ int main(int argc, char **argv) {
 			
 			//display "correct" or "wrong"
 			if (correct == 1) {
-				printf("Correct!\n");
+				printf("Correct!");
 				right++;
 			} else {
 				printf("Wrong!");
@@ -445,7 +474,7 @@ int main(int argc, char **argv) {
 				printf("\tCorrect was: \"%s\"",lang2_word[k]);
 			}
 		}
-		printf("\n");
+		printf("\n-------------------------------------------------------------------------\n");
 		pair++;
 	}
 	percent = (float) right / (float) pairs * 100;
@@ -456,6 +485,8 @@ int main(int argc, char **argv) {
 	if (remove("vocab.tmp") < 0) {
 		Error(5);
 	}
+	printf("Press 'Enter' to exit...\n");
+	getchar();
        	return EXIT_SUCCESS;
 }
 
@@ -464,34 +495,53 @@ int init(void) {
 	FILE *config_source;
 	char buf[1024];
 	char *conf_dir;
+	char overwrite[5] = "no";
+	int new = 0;
 	printf("\n---------------------------------------------------------------------");
 	printf("\nVocabC init function\n\nGetting HOME variable ... ");
 	conf_dir = getenv("HOME");
 	if (conf_dir == NULL) {
 		printf("Error.\n");
-		exit(EXIT_SUCCESS);
+		exit(EXIT_FAILURE);
 	}
 	printf("OK.\nHome is '%s'\n\n",conf_dir);
 	strncat(conf_dir,"/.config/vocabc/config",100);
 	printf("Open config file ... ");
-	configfile = fopen(conf_dir,"w+");
-	if (configfile == NULL) {
-		printf("Error.\n\n");
-		exit(EXIT_FAILURE);
+	configfile = fopen(conf_dir,"r");
+	if (configfile != NULL) {
+		printf("Configfile already exists. Do you want to overwrite it? (yes/no)\n");
+		fgets(overwrite, 5, stdin);
+		size_t len=strlen(overwrite);
+		overwrite[len-1]='\0';
+		if (strcmp(overwrite,"yes") == 0) {
+			printf("Generating new config file. ... ");
+			new = 1;
+		}
+		fclose(configfile);
+	} else {
+		printf("No config file found. Generating new. ... ");
+		new = 1;
 	}
-	printf("OK.\n\nOpen settings source file ... ");
-	config_source = fopen("conf.txt","r+");
-	if (config_source == NULL) {
-		printf("Error.\n\n");
-		exit(EXIT_FAILURE);
+	if (new == 1) {
+		configfile = fopen(conf_dir,"w+");
+		if (configfile == NULL) {
+			printf("Error.\n\n");
+			exit(EXIT_FAILURE);
+		}
+		printf("OK.\n\nOpen settings source file ... ");
+		config_source = fopen("conf.txt","r+");
+		if (config_source == NULL) {
+			printf("Error.\n\n");
+			exit(EXIT_FAILURE);
+		}
+		printf("OK.\n\nCopy settings into config file ... ");
+		while((fgets(buf, sizeof(buf), config_source)) != NULL) {
+			fputs(buf, configfile);
+		}
+		fclose(config_source);
+		fclose(configfile);
+		printf("Done.\n\n");
 	}
-	printf("OK.\n\nCopy settings into config file ... ");
-	while((fgets(buf, sizeof(buf), config_source)) != NULL) {
-		fputs(buf, configfile);
-	}
-	fclose(config_source);
-	fclose(configfile);
-	printf("Done.\n\n");
 	printf("----------------------------------------------------------------------");
 	printf("\nInitialisation completed.\nConfiguration file is '%s'\nChange default settings by editing this file\n",conf_dir);
 	printf("----------------------------------------------------------------------\n");
