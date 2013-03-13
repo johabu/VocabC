@@ -9,7 +9,7 @@
 #define MAX_WORDS 5
 #define MAX_TRIES 2
 #define MAX_LENGTH 1024
-#define VERSION "2.1beta"
+#define VERSION "2.1"
 
 
 FILE *vocabfile;
@@ -38,6 +38,7 @@ int Error(int error) {
 
 
 int main(int argc, char **argv) {
+	/*****VARIABLES*****/
 	//variables for getopt
 	char *fvalue = NULL, *dvalue = "1", *nvalue = "all";
 	int rvalue = 0, svalue = 0, ivalue = 0, cvalue = 1;
@@ -63,7 +64,7 @@ int main(int argc, char **argv) {
 	float percent;
 	//variables for bar
 	float bar_num, bar_loop;
-
+	/*****END OF VARIABLES*****/
 	if (argc < 2) {
 		Error(0);
 	}
