@@ -86,4 +86,32 @@ One point is that you can use it with different languages.
 	Before asking for a word the program gives you information about your progress and percentage of
 	the words you knew.
 
+===================================Errors====================================
+
+Following error codes may occur:
+
+	0	You didn't specify a vocabulary file using the -f option.
+		You have to specify a file name using VocabC -f <file>.
+	0x1	The file you specified could not be opened. 
+		Check if file exists and check permissions.
+	0x2	The number of pairs you wanted to be asked is higher than the
+		number of word pairs in the file.
+	0x3	Error while reading the vocabulary file.
+		Check if word pairs are in correct syntax and if file still
+		exists.
+	0x4	The error occured in reading your input. Maybe you pressed
+		a key combination like Crtl-D.
+	0x5	The program creats a temporary file. Program was unable to
+		delete this file.
+	0x6	The program couldn't clear the screen of your console.
+	0x7	Internal error.
+	0x8	At the given line in your vocabulary file there isn't a
+		readable word pair.
+	0x9	The program was unable to get the $HOME variable, thus
+		your configuration file couldn't be located.
+	0xa	The given command-line option requieres an argument.
+	0xb	The command-line option you entered doesn't exist.
+	0xc	This error occurs if you entered an option character the
+		program can't deal with.
+
 =============================================================================
