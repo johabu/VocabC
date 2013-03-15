@@ -1,5 +1,3 @@
-// #####	VocabC v2.0	##### //
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -8,7 +6,7 @@
 #include <time.h>
 #define MAX_WORDS 5
 #define MAX_TRIES 2
-#define MAX_LENGTH 1024
+#define MAX_LENGTH 256
 #define VERSION "2.1"
 
 
@@ -18,20 +16,21 @@ FILE *config;
 int glo_var;
 
 char *errors[] = {"VocabC requires argument -f <file>","Error in opening vocabulary file","too high argument of option -n","Error in reading vocabulary file",
-			"Error in input","Error in deleting temporary file","Unable to clear screen","Internal Error","","Unable to read $HOME"};
+			"Error in input","Error in deleting temporary file","Unable to clear screen","Internal Error","Err8","Unable to read $HOME",
+			"Err10","Err11","Err12"};
 int init(void);
 
 int Error(int error) {
 	if (error == 8) {
-		printf("Error 8 - Vocabfile doesn't contain a word pair at line %d!\n",glo_var);
+		printf("| Error %#x - Vocabfile doesn't contain a word pair at line %d!\n",error,glo_var);
 	} else {
-		printf("Error %d - %s!\n",error,errors[error]);
+		printf("| Error %#x - %s!\n",error,errors[error]);
 	}
-	if (remove("vocab.tmp") < 0) {
+	if ((error != 0) && (remove("vocab.tmp") < 0)) {
 		fclose(vocabfile);
 		remove("vocab.tmp");
 	}
-	printf("Press 'Enter' to exit...\n");
+	printf("| Press 'Enter' to exit...\n");
 	getchar();
 	exit(EXIT_FAILURE);
 }
@@ -194,13 +193,13 @@ int main(int argc, char **argv) {
 				break;
            		case '?':
              			if (optopt == 'f' || optopt == 'd') {
-               				fprintf (stderr, "Error - Option -%c requires an argument.\nPress 'Enter' to exit...\n", optopt);
+               				fprintf (stderr, "Error 0xa - Option -%c requires an argument.\nPress 'Enter' to exit...\n", optopt);
 					getchar();
              			} else if (isprint (optopt)) {
-               				fprintf (stderr, "Error - Unknown option `-%c'.\nPress 'Enter' to exit...\n", optopt);
+               				fprintf (stderr, "Error 0xb - Unknown option `-%c'.\nPress 'Enter' to exit...\n", optopt);
 					getchar();
              			} else {
-               				fprintf (stderr,"Error - Unknown option character `\\x%x'.\nPress 'Enter' to exit...\n",optopt);
+               				fprintf (stderr,"Error 0xc - Unknown option character `\\x%x'.\nPress 'Enter' to exit...\n",optopt);
              				getchar();
 				}
            		default:
@@ -266,19 +265,19 @@ int main(int argc, char **argv) {
 		Error(2);
 	}
 	//First output of the program - options which set are displayed
-	printf("----------------------------------------------------------------------\n");
-	printf("VocabC - version %s   Developed by Johabu <https://github.com/johabu>\n\nStatus:\n",VERSION);
-	if (rvalue == 1) { printf("Random order set\n"); }
-	if (svalue == 1) { printf("Case sensitivity set\n"); }
-	printf("Direction: ");
+	printf("-----------------------------------------------------------------------\n");
+	printf("| VocabC - version %s   Developed by Johabu <https://github.com/johabu>\n|\n| Status:\n| Vocabulary file: %s\n|",VERSION,fvalue);
+	if (rvalue == 1) { printf(" Random order set\n|"); }
+	if (svalue == 1) { printf(" Case sensitivity set\n|"); }
+	printf(" Direction: ");
 	if (strcmp(dvalue,"r") == 0) {
-		printf("both\n");
+		printf("both\n|");
 	} else {
-		printf("%s\n",dvalue);
+		printf("%s\n|",dvalue);
 	}
-	if (cvalue == 1) { printf("Comments will be displayed\n"); }
-	printf("%d pairs will be asked.\n",pairs);
-	printf("----------------------------------------------------------------------\n\n");
+	if (cvalue == 1) { printf(" Comments will be displayed\n|"); }
+	printf(" %d pairs will be asked.\n",pairs);
+	printf("-----------------------------------------------------------------------\n\n");
 	//main loop with query
 	for (i = 0; i < pairs; i++) {
 		strcpy(comm_str,"NULL");
@@ -397,12 +396,12 @@ int main(int argc, char **argv) {
 			}
 			printf("\n\n");
 			if (tries == 1) {
-				printf("|| word %d of %d || known: %g%% || progress: [", pair, pairs, percent);
+				printf("| word %d of %d || known: %g%% || progress: [", pair, pairs, percent);
 				bar_num = (float) pair / (float) pairs * 10;
 				for (bar_loop=1; bar_loop<=10; bar_loop++) {
 					(bar_loop<=bar_num) ? printf("=") : printf(" ");
 				}
-				printf("] ||\n");
+				printf("]\n|");
 			}
 			//is lang1_comm or lang2_comm not "NULL"?
 			if ((strcmp(lang1_comm,"NULL") != 0) && (strcmp(direction,"1") == 0)) {
@@ -413,9 +412,9 @@ int main(int argc, char **argv) {
 			}
 			//ask for a word and print the comment (if one exists)
 			if (strcmp(comm_str, "NULL") != 0) {
-				printf("word:  \"%s\"\t#: %s\n>>>  ",lang1_word,comm_str);
+				printf(" word:  \"%s\"\t#: %s\n| >>>  ",lang1_word,comm_str);
 			} else {
-				printf("word:  \"%s\"\n>>>  ",lang1_word);
+				printf(" word:  \"%s\"\n| >>>  ",lang1_word);
 			}
 			//user gives answer
 			if(fgets(input_str, MAX_LENGTH, stdin) == NULL) {
@@ -461,10 +460,10 @@ int main(int argc, char **argv) {
 			
 			//display "correct" or "wrong"
 			if (correct == 1) {
-				printf("Correct!");
+				printf("| Correct!");
 				right++;
 			} else {
-				printf("Wrong!");
+				printf("| Wrong!");
 			}
 		}
 		//too many tries? -> next word
@@ -479,14 +478,15 @@ int main(int argc, char **argv) {
 		pair++;
 	}
 	percent = (float) right / (float) pairs * 100;
-	printf("\nYou have known %g%% (%d/%d) of the words.\n\n",percent,right,pairs);
+	printf("\n| You have known %g%% (%d/%d) of the words.\n\n",percent,right,pairs);
+	//printf("%s\n",statistic_string);
 	//End of program, close files, remove temporary file
 	fclose(vocabfile);
 	fclose(sourcefile);
 	if (remove("vocab.tmp") < 0) {
 		Error(5);
 	}
-	printf("Press 'Enter' to exit...\n");
+	printf("| Press 'Enter' to exit...\n");
 	getchar();
        	return EXIT_SUCCESS;
 }

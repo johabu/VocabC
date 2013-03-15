@@ -72,6 +72,7 @@ One point is that you can use it with different languages.
 		-dr		Program sets direction randomly
 		-n <num>	ask <num> words
 		-s		case-sensitivity
+		-c		don't show comments
 	
 	If you stored settings in a configuration file, you don't need to set optional arguments.
 	If you set some, settings from the configuration file are overwritten.
