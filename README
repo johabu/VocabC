@@ -20,6 +20,7 @@
 version 1.7 is tested on Linux x86-64.
 version 2.0 is tested on Linux x86-64.
 version 2.1 is tested on Linux x86-64.
+version 2.2 is tested on Linux x86-64.
 
 ===========================Download and installing===========================
 
@@ -48,6 +49,9 @@ Configuration:
 
 VocabC is a simple vocabulary trainer. 
 One point is that you can use it with different languages.
+
+The output of VocabC is displayed in the language stored in $LANG.
+(At the moment only two languages: english and german)
 
 1)	To use the program, first create a vocab file.
 		!!!	The vocab has to be in this format:	!!!
