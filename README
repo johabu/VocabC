@@ -1,4 +1,4 @@
-=============================================================================
+=================================================================================
 	VocabC
 	Developed by Johabu <http://johabu.spheniscida.de>;
 				<http://github.com/johabu>
@@ -13,16 +13,16 @@
 
 	VocabC is distributed without any warranty!
 
-=============================================================================
+=================================================================================
 
-===================================README====================================
+=====================================README======================================
 
 version 1.7 is tested on Linux x86-64.
 version 2.0 is tested on Linux x86-64.
 version 2.1 is tested on Linux x86-64.
 version 2.2 is tested on Linux x86-64.
 
-===========================Download and installing===========================
+=============================Download and installing=============================
 
 First download the file (VocabC.zip or VocabC.tar.gz) and extract the files
 or clone the repository.
@@ -35,8 +35,8 @@ Compiling:
 		For a local install in one directory use
 			make localinstall
 	Windows:
-		Compile the files, e.g. with your Visual Studio Express or a Intel C/C++
-		compiler.
+		Compile the files, e.g. with your Visual Studio Express or a Intel
+		C/C++ compiler.
 
 Configuration:
 	When running 'make install' the program creates an config file
@@ -45,7 +45,7 @@ Configuration:
 	In the config file you can save your default settings, e.g. random
 	order by default. Look at this file to see which settings you can save.
 
-=====================================Use=====================================
+=======================================Use=======================================
 
 VocabC is a simple vocabulary trainer. 
 One point is that you can use it with different languages.
@@ -57,15 +57,20 @@ The output of VocabC is displayed in the language stored in $LANG.
 		!!!	The vocab has to be in this format:	!!!
 		!!!		word1 =	 word2a, word2b		!!!
 	Example: file name is e.g. "voc_1.txt"
-		Personal =personnel,staff	#several meanings possible
-		#english-german/spanish		#comments with '#' (must be the first character in the line)
-		german   =deutsch,alemán	#many languages possible (ISO 8859-15)
-		to fit   =caber#in english	#spaces possible; comments for one side possible
+
+	Personal =personnel,staff	#several meanings possible
+	#english-german/spanish		#comments with '#' 
+					(must be the first character in the line)
+	german   =deutsch,alemán	#many languages possible (ISO 8859-15)
+	to fit   =caber#in english	#spaces possible;
+					comments for one side possible
+
 	See also the vocabulary file "example.txt"
 
 2)	Start the program:
 	type:	VocabC -f <file>	
-		If this doesn't work, try ./VocabC -f <file> in the directory in which you installed the program.
+		If this doesn't work, try ./VocabC -f <file> in the directory
+		in which you installed the program.
 		Check also your PATH variable.
 	
 	Optional arguments:
@@ -82,15 +87,16 @@ The output of VocabC is displayed in the language stored in $LANG.
 	If you set some, settings from the configuration file are overwritten.
 
 3)	Use:
-	At first the program prints some information like the number of words which are going to be asked.
+	At first the program prints some information like the number of words 
+	which are going to be asked.
 	The program asks you for the word on the right side in the file.
 	(when you set -d2 (-dr) , it asks you (maybe) for the left one)
 	You have to type the word from the right side.
-	Be careful with the spelling! You have two tries, e.g. if you misspelled a word.
-	Before asking for a word the program gives you information about your progress and percentage of
-	the words you knew.
+	Be careful with the spelling! You have two tries, e.g. if you misspelled
+	a word. Before asking for a word the program gives you information about
+	your progress and percentage of the words you knew.
 
-===================================Errors====================================
+=====================================Errors======================================
 
 Following error codes may occur:
 
