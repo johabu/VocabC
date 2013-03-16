@@ -5,11 +5,11 @@ NAME = VocabC
 
 localinstall: 
 	mkdir -p ~/.config/vocabc
-	$(CC) $(CFLAGS) -o $(NAME) vocabc.c
+	$(CC) $(CFLAGS) -o $(NAME) vocabc.c vocabc_lang.c
 	./$(NAME) -i
 install: 
 	mkdir -p ~/.config/vocabc
-	$(CC) $(CFLAGS) -o $(NAME) vocabc.c
+	$(CC) $(CFLAGS) -o $(NAME) vocabc.c vocabc_lang.c
 	sudo cp $(NAME) $(BINDIR)
 	$(NAME) -i
 clean:
