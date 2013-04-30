@@ -82,6 +82,8 @@ int main(int argc, char **argv) {
 	char *lang_code = getenv("LANG");
 	if (strstr(lang_code,"de") != NULL) {
 		lang = 1;
+	} else if (strstr(lang_code,"es") != NULL) {
+		lang = 2;
 	} else {
 		lang = 0;
 	}
@@ -168,7 +170,7 @@ int main(int argc, char **argv) {
 			}
 		}
 	}
-
+	// check which options are set by the user
 	while ((CHAR = getopt (argc, argv, "hrf:d:n:sci")) != -1) {
 		switch (CHAR) {
           		case 'h':
@@ -459,7 +461,7 @@ int main(int argc, char **argv) {
 					}
 				}
 			} else {
-				if (cvalue == 1) {
+				if (svalue == 1) {
 					if (strcmp(lang2_word[k], input_str) == 0) {
 						correct = 1;
 					}
@@ -521,7 +523,7 @@ int init(void) {
 	printf("Open config file ... ");
 	configfile = fopen(conf_dir,"r");
 	if (configfile != NULL) {
-		printf("Configfile already exists. Do you want to overwrite it? (yes/no)\n");
+		printf("Configfile already exists. Do you want to overwrite it? (yes/NO)\n");
 		fgets(overwrite, 5, stdin);
 		size_t len=strlen(overwrite);
 		overwrite[len-1]='\0';

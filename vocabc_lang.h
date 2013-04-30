@@ -25,10 +25,10 @@
 
 #define EXIT 0
 
-extern char *query_strings[2][10];
+extern char *query_strings[3][10];
 
-extern char *status_strings[2][10];
+extern char *status_strings[3][10];
 
-extern char *program_strings[2][3];
+extern char *program_strings[3][3];
 
 #endif
