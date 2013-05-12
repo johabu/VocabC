@@ -18,11 +18,24 @@ FILE *config;
 int glo_var;
 int lang;
 
+struct Options {
+	char *fvalue;	// NULL
+	char *dvalue;	// "1"
+	char *nvalue;	// "all"
+	int rvalue;	// 0
+	int svalue;	// 0
+	int ivalue;	// 0
+	int cvalue;	// 1
+};
+
+//Errors which will be displayed
 char *errors[] = {"VocabC requires argument -f <file>","Error in opening vocabulary file","too high argument of option -n","Error in reading vocabulary file",
 			"Error in input","Error in deleting temporary file","Unable to clear screen","Internal Error","Err8","Unable to read $HOME",
 			"Err10","Err11","Err12"};
+//Init function (VocabC -i); code at the end of file
 int init(void);
 
+//Function for displaying an error
 int Error(int error) {
 	if (error == 8) {
 		printf("| Error %#x - Vocabfile doesn't contain a word pair at line %d!\n",error,glo_var);
@@ -38,12 +51,12 @@ int Error(int error) {
 	exit(EXIT_FAILURE);
 }
 
-
+//Main function with query
 int main(int argc, char **argv) {
 	/*****VARIABLES*****/
+	//structure with options set by user
+	struct Options User_settings = { NULL, "1", "all", 0, 0, 0, 1 };
 	//variables for getopt
-	char *fvalue = NULL, *dvalue = "1", *nvalue = "all";
-	int rvalue = 0, svalue = 0, ivalue = 0, cvalue = 1;
 	int CHAR;
 	opterr = 0;
 	//variables for query and output
@@ -55,6 +68,7 @@ int main(int argc, char **argv) {
 	char lang2_word[MAX_WORDS][MAX_LENGTH];
 	char *ptr;
 	char setting[MAX_LENGTH];
+	char *lang_code, *conf_dir;
 	//different tokens for dividing strings
 	char lang_token[] = "=\n", word_token[] = ",", comm_token[] = "#";
 	unsigned int pairs = 0, pair = 1, lines = 0, word = 0;
@@ -67,6 +81,7 @@ int main(int argc, char **argv) {
 	//variables for bar
 	float bar_num, bar_loop;
 	/*****END OF VARIABLES*****/
+
 	if (argc < 2) {
 		Error(0);
 	}
@@ -79,7 +94,7 @@ int main(int argc, char **argv) {
 		}
 	}
 	//get LANG variable
-	char *lang_code = getenv("LANG");
+	lang_code = getenv("LANG");
 	if (strstr(lang_code,"de") != NULL) {
 		lang = 1;
 	} else if (strstr(lang_code,"es") != NULL) {
@@ -88,7 +103,6 @@ int main(int argc, char **argv) {
 		lang = 0;
 	}
 	//get the HOME variable to locate the config file
-	char *conf_dir;
 	conf_dir = getenv("HOME");
 	if (conf_dir == NULL) {
 		Error(9);
@@ -118,7 +132,7 @@ int main(int argc, char **argv) {
 	for (i = 0; i < 9; i++) {
 		if (strncmp(settings[i],"random = ",9) == 0) {
 			if (strstr(settings[i],"true") != NULL) {
-				rvalue = 1;
+				User_settings.rvalue = 1;
 			}
 		}
 	}
@@ -126,11 +140,11 @@ int main(int argc, char **argv) {
 	for (i = 0; i < 9; i++) {
 		if (strncmp(settings[i],"direction = ",12) == 0) {
 			if (settings[i][13] == '1') {
-				strcpy(dvalue,"1");
+				strcpy(User_settings.dvalue,"1");
 			} else if (settings[i][13] == '2') {
-				strcpy(dvalue,"2");
+				strcpy(User_settings.dvalue,"2");
 			} else if (settings[i][13] == 'r') {
-				strcpy(dvalue,"r");
+				strcpy(User_settings.dvalue,"r");
 			}
 		}
 	}
@@ -138,18 +152,18 @@ int main(int argc, char **argv) {
 	for (i = 0; i < 9; i++) {
 		if (strncmp(settings[i],"pairs = ",8) == 0) {
 			if (strstr(settings[i],"all") != NULL) {
-				strcpy(nvalue,"all");
+				strcpy(User_settings.nvalue,"all");
 			} else {
 				ptr = strtok(settings[i], "=");
 				ptr = strtok(NULL, "=");
-				strcpy(nvalue,ptr);
-				while (nvalue[0] == ' ') {
-					for (j = 0; j < strlen(nvalue); j++) {
-						nvalue[j] = nvalue[j+1];
+				strcpy(User_settings.nvalue,ptr);
+				while (User_settings.nvalue[0] == ' ') {
+					for (j = 0; j < strlen(User_settings.nvalue); j++) {
+						User_settings.nvalue[j] = User_settings.nvalue[j+1];
 					}
 				}
-				while (nvalue[strlen(nvalue)-1] == ' ') {
-					nvalue[strlen(nvalue)-1] = '\0';
+				while (User_settings.nvalue[strlen(User_settings.nvalue)-1] == ' ') {
+					User_settings.nvalue[strlen(User_settings.nvalue)-1] = '\0';
 				}
 			}
 		}
@@ -158,7 +172,7 @@ int main(int argc, char **argv) {
 	for (i = 0; i < 9; i++) {
 		if (strncmp(settings[i],"sensitivity = ",14) == 0) {
 			if (strstr(settings[i],"true") != NULL) {
-				svalue = 1;
+				User_settings.svalue = 1;
 			}
 		}
 	}
@@ -166,7 +180,7 @@ int main(int argc, char **argv) {
 	for (i = 0; i < 9; i++) {
 		if (strncmp(settings[i],"comments = ",11) == 0) {
 			if (strstr(settings[i],"true") != NULL) {
-				cvalue = 1;
+				User_settings.cvalue = 1;
 			}
 		}
 	}
@@ -183,25 +197,25 @@ int main(int argc, char **argv) {
 				printf("-c\tdon't display comments\n");
 				return EXIT_FAILURE;	
             		case 'f':
-				fvalue = optarg;
+				User_settings.fvalue = optarg;
              			break;
 			case 'r':
-				rvalue = 1;
+				User_settings.rvalue = 1;
 				break;
 			case 'd':
-				dvalue = optarg;
+				User_settings.dvalue = optarg;
 				break;
 			case 'n':
-				nvalue = optarg;
+				User_settings.nvalue = optarg;
 				break;
 			case 's':
-				svalue = 1;
+				User_settings.svalue = 1;
 				break;
 			case 'c':
-				cvalue = 0;
+				User_settings.cvalue = 0;
 				break;
 			case 'i':
-				ivalue = 1;
+				User_settings.ivalue = 1;
 				break;
            		case '?':
              			if (optopt == 'f' || optopt == 'd') {
@@ -219,11 +233,11 @@ int main(int argc, char **argv) {
            	}
 	}
 	// if -i, execute init()
-	if (ivalue == 1) {
+	if (User_settings.ivalue == 1) {
 		init();
 	}
 	//Open vocabulary file
-	sourcefile = fopen(fvalue,"r");
+	sourcefile = fopen(User_settings.fvalue,"r");
 	vocabfile = fopen("vocab.tmp","w");
 	if (NULL == vocabfile || NULL == sourcefile) {
 		Error(1);
@@ -256,7 +270,7 @@ int main(int argc, char **argv) {
 		rand_lines[i] = i+1;
 	}
 	//if -r is set, shuffle array
-	if (rvalue == 1) {
+	if (User_settings.rvalue == 1) {
 		for (i = 0; i < 5000; i++) {
 			index_a = rand() % lines;
 			index_b = rand() % lines;
@@ -267,30 +281,30 @@ int main(int argc, char **argv) {
 	}
 	//How many words should be asked?
 		//ask all pairs
-	if (strcmp(nvalue, "all") == 0) {
+	if (strcmp(User_settings.nvalue, "all") == 0) {
 		pairs = lines;
 	} else {
 		//ask only -n <num> words
-		pairs = atoi(nvalue);
+		pairs = atoi(User_settings.nvalue);
 	}
 	if (pairs > lines) {
 		Error(2);
 	}
 	//First output of the program - options which set are displayed
-	printf("-----------------------------------------------------------------------\n");
+	printf("------------------------------------------------------------------------\n");
 	printf("| VocabC - %s %s   %s <https://github.com/johabu>\n|\n",status_strings[lang][VERS],VERSION,status_strings[lang][DEVELOP]);
-	printf("| %s:\n| %s: %s\n|",status_strings[lang][STATUS],status_strings[lang][VOCFILE],fvalue);
-	if (rvalue == 1) { printf(" %s\n|",status_strings[lang][RANDOM]); }
-	if (svalue == 1) { printf(" %s\n|",status_strings[lang][CASE]); }
+	printf("| %s:\n| %s: %s\n|",status_strings[lang][STATUS],status_strings[lang][VOCFILE],User_settings.fvalue);
+	if (User_settings.rvalue == 1) { printf(" %s\n|",status_strings[lang][RANDOM]); }
+	if (User_settings.svalue == 1) { printf(" %s\n|",status_strings[lang][CASE]); }
 	printf(" %s: ",status_strings[lang][DIRECTION]);
-	if (strcmp(dvalue,"r") == 0) {
+	if (strcmp(User_settings.dvalue,"r") == 0) {
 		printf("%s\n|",status_strings[lang][BOTH]);
 	} else {
-		printf("%s\n|",dvalue);
+		printf("%s\n|",User_settings.dvalue);
 	}
-	if (cvalue == 1) { printf(" %s\n|",status_strings[lang][COMMENT]); }
+	if (User_settings.cvalue == 1) { printf(" %s\n|",status_strings[lang][COMMENT]); }
 	printf(" %d %s\n",pairs,status_strings[lang][PAIRS]);
-	printf("-----------------------------------------------------------------------\n\n");
+	printf("------------------------------------------------------------------------\n\n");
 	//main loop with query
 	for (i = 0; i < pairs; i++) {
 		strcpy(comm_str,"NULL");
@@ -348,8 +362,8 @@ int main(int argc, char **argv) {
 		}
 		is_giv = 0;
 		//is -dr set?
-		if (strcmp(dvalue,"r") != 0) {
-				strcpy(direction,dvalue);
+		if (strcmp(User_settings.dvalue,"r") != 0) {
+				strcpy(direction,User_settings.dvalue);
 		} else {
 			if ((rand() % 2) != 0) {
 				strcpy(direction,"2");
@@ -450,7 +464,7 @@ int main(int argc, char **argv) {
 			//is any of the meanings equal to the user`s answer?
 			if (strcmp(direction,"2") != 0) {
 				for (j = 0; j < 5; j++) {
-					if (svalue == 1) {
+					if (User_settings.svalue == 1) {
 						if (strcmp(lang2_word[j], input_str) == 0) {
 							correct = 1;
 						}
@@ -461,7 +475,7 @@ int main(int argc, char **argv) {
 					}
 				}
 			} else {
-				if (svalue == 1) {
+				if (User_settings.svalue == 1) {
 					if (strcmp(lang2_word[k], input_str) == 0) {
 						correct = 1;
 					}
@@ -504,6 +518,7 @@ int main(int argc, char **argv) {
        	return EXIT_SUCCESS;
 }
 
+//Init function; exucute when installing VocabC; generating configuartion file for default user settings
 int init(void) {
 	FILE *configfile;
 	FILE *config_source;
