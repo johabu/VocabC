@@ -21,10 +21,9 @@ int lang;
 struct Options {
 	char *fvalue;	// NULL
 	char *dvalue;	// "1"
-	char *nvalue;	// "all"
+	char nvalue[5];	// "all"
 	int rvalue;	// 0
 	int svalue;	// 0
-	int ivalue;	// 0
 	int cvalue;	// 1
 };
 
@@ -51,64 +50,65 @@ int Error(int error) {
 	exit(EXIT_FAILURE);
 }
 
-//Main function with query
-int main(int argc, char **argv) {
-	/*****VARIABLES*****/
-	//structure with options set by user
-	struct Options User_settings = { NULL, "1", "all", 0, 0, 0, 1 };
+//Read the options the user set when starting VocabC
+struct Options Read_user_options (int argc, char **argv, struct Options User_options) {
 	//variables for getopt
 	int CHAR;
 	opterr = 0;
-	//variables for query and output
-	char buffer[MAX_LENGTH], source_str[MAX_LENGTH], input_str[MAX_LENGTH];
-	char settings[10][MAX_LENGTH];
-	char comm_str[MAX_LENGTH], lang1_comm[MAX_LENGTH], lang2_comm[MAX_LENGTH];
-	char lang1_word[MAX_LENGTH], lang1_str[MAX_LENGTH], lang2_str[MAX_LENGTH];
-	char line[MAX_LENGTH], temp[MAX_LENGTH], temp_word[MAX_LENGTH], lang2_temp_str[MAX_LENGTH];
-	char lang2_word[MAX_WORDS][MAX_LENGTH];
-	char *ptr;
-	char setting[MAX_LENGTH];
-	char *lang_code, *conf_dir;
-	//different tokens for dividing strings
-	char lang_token[] = "=\n", word_token[] = ",", comm_token[] = "#";
-	unsigned int pairs = 0, pair = 1, lines = 0, word = 0;
-	//loop variables
-	unsigned int i, j, l, k = 0;
-	int is_giv, index_a, index_b, temp_rand;
-	unsigned int right = 0, correct = 0, tries = 0;
-	char direction[2] = "1";
-	float percent;
-	//variables for bar
-	float bar_num, bar_loop;
-	/*****END OF VARIABLES*****/
+	// check which options are set by the user
+	while ((CHAR = getopt (argc, argv, "hrf:d:n:sc")) != -1) {
+		switch (CHAR) {
+          		case 'h':
+				printf("\nVocabC %s\n",VERSION);
+            			printf("\nUse:\tVocabC -f <file>\n");
+				printf("\nOptional arguments:\n-h\tShow this help\n-r\tRandomize the order of the words\n");
+				printf("-d1\tThe program asks the first word\n-d2\tThe program asks the second word\n-dr\tthe program asks randomly\n");
+				printf("-n <num>\tAsk only <num> words\n");
+				printf("-s\tCase sensitive\n");
+				printf("-c\tdon't display comments\n");
+				exit(EXIT_FAILURE);
+            		case 'f':
+				User_options.fvalue = optarg;
+             			break;
+			case 'r':
+				User_options.rvalue = 1;
+				break;
+			case 'd':
+				User_options.dvalue = optarg;
+				break;
+			case 'n':
+				strcpy(User_options.nvalue,optarg);
+				break;
+			case 's':
+				User_options.svalue = 1;
+				break;
+			case 'c':
+				User_options.cvalue = 0;
+				break;
+           		case '?':
+             			if (optopt == 'f' || optopt == 'd') {
+               				fprintf (stderr, "Error 0xa - Option -%c requires an argument.\n%s...\n", optopt, program_strings[lang][EXIT]);
+					getchar();
+             			} else if (isprint (optopt)) {
+               				fprintf (stderr, "Error 0xb - Unknown option `-%c'.\n%s...\n", optopt, program_strings[lang][EXIT]);
+					getchar();
+             			} else {
+               				fprintf (stderr,"Error 0xc - Unknown option character `\\x%x'.\n%s...\n",optopt, program_strings[lang][EXIT]);
+             				getchar();
+				}
+           		default:
+             			exit(EXIT_FAILURE);
+           	}
+	}
+	return User_options;
+}
 
-	if (argc < 2) {
-		Error(0);
-	}
-	//Should the init-function be executed?
-	if (strcmp(argv[1],"-i") == 0) {
-		init();
-	} else {
-		if (system("clear") == -1) {
-			Error(6);
-		}
-	}
-	//get LANG variable
-	lang_code = getenv("LANG");
-	if (strstr(lang_code,"de") != NULL) {
-		lang = 1;
-	} else if (strstr(lang_code,"es") != NULL) {
-		lang = 2;
-	} else {
-		lang = 0;
-	}
-	//get the HOME variable to locate the config file
-	conf_dir = getenv("HOME");
-	if (conf_dir == NULL) {
-		Error(9);
-	}
-	strncat(conf_dir,"/.config/vocabc/config",100);
-	//open config file
+//Read configuration file and store settings in structure
+struct Options Read_user_defaults (char *conf_dir, struct Options User_settings) {
+	char settings[10][MAX_LENGTH];
+	char setting[MAX_LENGTH];
+	unsigned int i,j;
+	char *ptr;
 	config = fopen(conf_dir,"r");
 	if (config == NULL) {
 		printf("\nUnable to open configuration file. Try VocabC -i to fix the problem.\n");
@@ -152,11 +152,11 @@ int main(int argc, char **argv) {
 	for (i = 0; i < 9; i++) {
 		if (strncmp(settings[i],"pairs = ",8) == 0) {
 			if (strstr(settings[i],"all") != NULL) {
-				strcpy(User_settings.nvalue,"all");
+				strcpy(User_settings.nvalue, "all");
 			} else {
 				ptr = strtok(settings[i], "=");
 				ptr = strtok(NULL, "=");
-				strcpy(User_settings.nvalue,ptr);
+				strcpy(User_settings.nvalue, ptr);
 				while (User_settings.nvalue[0] == ' ') {
 					for (j = 0; j < strlen(User_settings.nvalue); j++) {
 						User_settings.nvalue[j] = User_settings.nvalue[j+1];
@@ -184,58 +184,71 @@ int main(int argc, char **argv) {
 			}
 		}
 	}
-	// check which options are set by the user
-	while ((CHAR = getopt (argc, argv, "hrf:d:n:sci")) != -1) {
-		switch (CHAR) {
-          		case 'h':
-				printf("\nVocabC %s\n",VERSION);
-            			printf("\nUse:\tVocabC -f <file>\n");
-				printf("\nOptional arguments:\n-h\tShow this help\n-r\tRandomize the order of the words\n");
-				printf("-d1\tThe program asks the first word\n-d2\tThe program asks the second word\n-dr\tthe program asks randomly\n");
-				printf("-n <num>\tAsk only <num> words\n");
-				printf("-s\tCase sensitive\n");
-				printf("-c\tdon't display comments\n");
-				return EXIT_FAILURE;	
-            		case 'f':
-				User_settings.fvalue = optarg;
-             			break;
-			case 'r':
-				User_settings.rvalue = 1;
-				break;
-			case 'd':
-				User_settings.dvalue = optarg;
-				break;
-			case 'n':
-				User_settings.nvalue = optarg;
-				break;
-			case 's':
-				User_settings.svalue = 1;
-				break;
-			case 'c':
-				User_settings.cvalue = 0;
-				break;
-			case 'i':
-				User_settings.ivalue = 1;
-				break;
-           		case '?':
-             			if (optopt == 'f' || optopt == 'd') {
-               				fprintf (stderr, "Error 0xa - Option -%c requires an argument.\n%s...\n", optopt, program_strings[lang][EXIT]);
-					getchar();
-             			} else if (isprint (optopt)) {
-               				fprintf (stderr, "Error 0xb - Unknown option `-%c'.\n%s...\n", optopt, program_strings[lang][EXIT]);
-					getchar();
-             			} else {
-               				fprintf (stderr,"Error 0xc - Unknown option character `\\x%x'.\n%s...\n",optopt, program_strings[lang][EXIT]);
-             				getchar();
-				}
-           		default:
-             			return EXIT_FAILURE;
-           	}
+	return User_settings;
+}
+
+
+//Main function with query
+int main(int argc, char **argv) {
+	/*****VARIABLES*****/
+	//structure with options set by user
+	struct Options User_settings = { NULL, "1", "all", 0, 0, 1 };
+	//variables for query and output
+	char buffer[MAX_LENGTH], source_str[MAX_LENGTH], input_str[MAX_LENGTH];
+	//char settings[10][MAX_LENGTH];
+	char comm_str[MAX_LENGTH], lang1_comm[MAX_LENGTH], lang2_comm[MAX_LENGTH];
+	char lang1_word[MAX_LENGTH], lang1_str[MAX_LENGTH], lang2_str[MAX_LENGTH];
+	char line[MAX_LENGTH], temp[MAX_LENGTH], temp_word[MAX_LENGTH], lang2_temp_str[MAX_LENGTH];
+	char lang2_word[MAX_WORDS][MAX_LENGTH];
+	char *ptr;
+	//char setting[MAX_LENGTH];
+	char *lang_code, *conf_dir;
+	//different tokens for dividing strings
+	char lang_token[] = "=\n", word_token[] = ",", comm_token[] = "#";
+	unsigned int pairs = 0, pair = 1, lines = 0, word = 0;
+	//loop variables
+	unsigned int i, j, l, k = 0;
+	int is_giv, index_a, index_b, temp_rand;
+	unsigned int right = 0, correct = 0, tries = 0;
+	char direction[2] = "1";
+	float percent;
+	//variables for bar
+	float bar_num, bar_loop;
+	/*****END OF VARIABLES*****/
+
+	if (argc < 2) {
+		Error(0);
 	}
-	// if -i, execute init()
-	if (User_settings.ivalue == 1) {
+	//Should the init-function be executed?
+	if (strcmp(argv[1],"-i") == 0) {
 		init();
+	} else {
+		if (system("clear") == -1) {
+			Error(6);
+		}
 	}
+	//get LANG variable
+	lang_code = getenv("LANG");
+	if (strstr(lang_code,"de") != NULL) {
+		lang = 1;
+	} else if (strstr(lang_code,"es") != NULL) {
+		lang = 2;
+	} else {
+		lang = 0;
+	}
+	//get the HOME variable to locate the config file
+	conf_dir = getenv("HOME");
+	if (conf_dir == NULL) {
+		Error(9);
+	}
+	strncat(conf_dir,"/.config/vocabc/config",100);
+	//Read the default configuration of the user
+	User_settings = Read_user_defaults(conf_dir, User_settings);
+
+	
+	// check which options are set by the user
+	User_settings = Read_user_options(argc, argv, User_settings);
+
 	//Open vocabulary file
 	sourcefile = fopen(User_settings.fvalue,"r");
 	vocabfile = fopen("vocab.tmp","w");
