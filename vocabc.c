@@ -25,6 +25,7 @@ struct Options {
 	int rvalue;	// 0
 	int svalue;	// 0
 	int cvalue;	// 1
+	int xvalue;	// 0
 };
 
 //Errors which will be displayed
@@ -56,7 +57,7 @@ struct Options Read_user_options (int argc, char **argv, struct Options User_opt
 	int CHAR;
 	opterr = 0;
 	// check which options are set by the user
-	while ((CHAR = getopt (argc, argv, "hrf:d:n:sc")) != -1) {
+	while ((CHAR = getopt (argc, argv, "hrf:d:n:scx")) != -1) {
 		switch (CHAR) {
           		case 'h':
 				printf("\nVocabC %s\n",VERSION);
@@ -66,6 +67,7 @@ struct Options Read_user_options (int argc, char **argv, struct Options User_opt
 				printf("-n <num>\tAsk only <num> words\n");
 				printf("-s\tCase sensitive\n");
 				printf("-c\tdon't display comments\n");
+				printf("-x\tignore settings stored in config file\n");
 				exit(EXIT_FAILURE);
             		case 'f':
 				strncpy(User_options.fvalue, optarg, 95);
@@ -87,6 +89,9 @@ struct Options Read_user_options (int argc, char **argv, struct Options User_opt
 				break;
 			case 'c':
 				User_options.cvalue = 0;
+				break;
+			case 'x':
+				User_options.xvalue = 1;
 				break;
            		case '?':
              			if (optopt == 'f' || optopt == 'd') {
@@ -201,7 +206,8 @@ int main(int argc, char **argv) {
 		.nvalue = "all",
 		.rvalue = 0,
 		.svalue = 0,
-		.cvalue = 1
+		.cvalue = 1,
+		.xvalue = 0
 	};	
 	//variables for query and output
 	char buffer[MAX_LENGTH], source_str[MAX_LENGTH], input_str[MAX_LENGTH];
@@ -252,12 +258,14 @@ int main(int argc, char **argv) {
 		Error(9);
 	}
 	strncat(conf_dir,"/.config/vocabc/config",100);
-	//Read the default configuration of the user
-	User_settings = Read_user_defaults(conf_dir, User_settings);
-
-	
 	// check which options are set by the user
 	User_settings = Read_user_options(argc, argv, User_settings);
+	if (User_settings.xvalue != 1) {
+		//Read the default configuration of the user
+	        User_settings = Read_user_defaults(conf_dir, User_settings);
+		// check which options are set by the user
+	        User_settings = Read_user_options(argc, argv, User_settings);
+	}
 
 	//Open vocabulary file
 	sourcefile = fopen(User_settings.fvalue,"r");

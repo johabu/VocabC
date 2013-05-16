@@ -82,6 +82,7 @@ The output of VocabC is displayed in the language stored in $LANG.
 		-n <num>	ask <num> words
 		-s		case-sensitivity
 		-c		don't show comments
+		-x		ignore default settings stored in config file
 	
 	If you stored settings in a configuration file, you don't need to set 
 	optional arguments.
@@ -105,8 +106,6 @@ Following error codes may occur:
 		You have to specify a file name using VocabC -f <file>.
 	0x1	The file you specified could not be opened. 
 		Check if file exists and check permissions.
-	[0x2]	[The number of pairs you wanted to be asked is higher than the
-		number of word pairs in the file.] (no error at all)
 	0x3	Error while reading the vocabulary file.
 		Check if word pairs are in correct syntax and if file still
 		exists.
