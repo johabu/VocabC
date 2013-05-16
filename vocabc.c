@@ -9,7 +9,7 @@
 #define MAX_WORDS 5
 #define MAX_TRIES 2
 #define MAX_LENGTH 256
-#define VERSION "2.2"
+#define VERSION "2.3"
 
 
 FILE *vocabfile;
