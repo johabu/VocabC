@@ -105,8 +105,8 @@ Following error codes may occur:
 		You have to specify a file name using VocabC -f <file>.
 	0x1	The file you specified could not be opened. 
 		Check if file exists and check permissions.
-	0x2	The number of pairs you wanted to be asked is higher than the
-		number of word pairs in the file.
+	[0x2]	[The number of pairs you wanted to be asked is higher than the
+		number of word pairs in the file.] (no error at all)
 	0x3	Error while reading the vocabulary file.
 		Check if word pairs are in correct syntax and if file still
 		exists.

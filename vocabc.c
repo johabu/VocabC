@@ -311,7 +311,8 @@ int main(int argc, char **argv) {
 		pairs = atoi(User_settings.nvalue);
 	}
 	if (pairs > lines) {
-		Error(2);
+		//Error(2);
+		pairs = lines;
 	}
 	//First output of the program - options which set are displayed
 	printf("------------------------------------------------------------------------\n");
