@@ -19,9 +19,9 @@ int glo_var;
 int lang;
 
 struct Options {
-	char *fvalue;	// NULL
-	char *dvalue;	// "1"
-	char nvalue[5];	// "all"
+	char fvalue[96];// NULL
+	char dvalue[6];	// "1"
+	char nvalue[6];	// "all"
 	int rvalue;	// 0
 	int svalue;	// 0
 	int cvalue;	// 1
@@ -68,16 +68,19 @@ struct Options Read_user_options (int argc, char **argv, struct Options User_opt
 				printf("-c\tdon't display comments\n");
 				exit(EXIT_FAILURE);
             		case 'f':
-				User_options.fvalue = optarg;
+				strncpy(User_options.fvalue, optarg, 95);
+				User_options.fvalue[95] = '\0';
              			break;
 			case 'r':
 				User_options.rvalue = 1;
 				break;
 			case 'd':
-				User_options.dvalue = optarg;
+				strncpy(User_options.dvalue, optarg, 5);
+				User_options.dvalue[5] = '\0';
 				break;
 			case 'n':
-				strcpy(User_options.nvalue,optarg);
+				strncpy(User_options.nvalue, optarg, 5);
+				User_options.nvalue[5] = '\0';
 				break;
 			case 's':
 				User_options.svalue = 1;
@@ -192,17 +195,22 @@ struct Options Read_user_defaults (char *conf_dir, struct Options User_settings)
 int main(int argc, char **argv) {
 	/*****VARIABLES*****/
 	//structure with options set by user
-	struct Options User_settings = { NULL, "1", "all", 0, 0, 1 };
+	struct Options User_settings = {
+		.fvalue = "NULL",
+		.dvalue = "1",
+		.nvalue = "all",
+		.rvalue = 0,
+		.svalue = 0,
+		.cvalue = 1
+	};	
 	//variables for query and output
 	char buffer[MAX_LENGTH], source_str[MAX_LENGTH], input_str[MAX_LENGTH];
-	//char settings[10][MAX_LENGTH];
 	char comm_str[MAX_LENGTH], lang1_comm[MAX_LENGTH], lang2_comm[MAX_LENGTH];
 	char lang1_word[MAX_LENGTH], lang1_str[MAX_LENGTH], lang2_str[MAX_LENGTH];
 	char line[MAX_LENGTH], temp[MAX_LENGTH], temp_word[MAX_LENGTH], lang2_temp_str[MAX_LENGTH];
 	char lang2_word[MAX_WORDS][MAX_LENGTH];
 	char *ptr;
-	//char setting[MAX_LENGTH];
-	char *lang_code, *conf_dir;
+	char lang_code[20], conf_dir[100];
 	//different tokens for dividing strings
 	char lang_token[] = "=\n", word_token[] = ",", comm_token[] = "#";
 	unsigned int pairs = 0, pair = 1, lines = 0, word = 0;
@@ -228,7 +236,8 @@ int main(int argc, char **argv) {
 		}
 	}
 	//get LANG variable
-	lang_code = getenv("LANG");
+	strncpy(lang_code, getenv("LANG"), 19);
+	lang_code[19] = '\0';
 	if (strstr(lang_code,"de") != NULL) {
 		lang = 1;
 	} else if (strstr(lang_code,"es") != NULL) {
@@ -237,7 +246,8 @@ int main(int argc, char **argv) {
 		lang = 0;
 	}
 	//get the HOME variable to locate the config file
-	conf_dir = getenv("HOME");
+	strncpy(conf_dir, getenv("HOME"), 75);
+	conf_dir[75] = '\0';
 	if (conf_dir == NULL) {
 		Error(9);
 	}
@@ -510,7 +520,7 @@ int main(int argc, char **argv) {
 		//too many tries? -> next word
 		if (correct != 1) {
 			if (strcmp(direction,"2") != 0) {
-				printf("\t%s: \"%s\"",query_strings[lang][CORR_WAS],lang2_word[0]);
+				printf("\t%s: \"%s\"",query_strings[lang][CORR_WAS],lang2_str);
 			} else {
 				printf("\t%s: \"%s\"",query_strings[lang][CORR_WAS],lang2_word[k]);
 			}

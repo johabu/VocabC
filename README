@@ -83,7 +83,8 @@ The output of VocabC is displayed in the language stored in $LANG.
 		-s		case-sensitivity
 		-c		don't show comments
 	
-	If you stored settings in a configuration file, you don't need to set optional arguments.
+	If you stored settings in a configuration file, you don't need to set 
+	optional arguments.
 	If you set some, settings from the configuration file are overwritten.
 
 3)	Use:
