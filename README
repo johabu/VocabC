@@ -51,7 +51,7 @@ VocabC is a simple vocabulary trainer.
 One point is that you can use it with different languages.
 
 The output of VocabC is displayed in the language stored in $LANG.
-(At the moment only two languages: english and german)
+(At the moment 3 languages: english, german and spanish)
 
 1)	To use the program, first create a vocab file.
 		!!!	The vocab has to be in this format:	!!!
