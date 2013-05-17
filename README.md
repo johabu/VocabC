@@ -1,23 +1,20 @@
 README for VocabC
 ==================
-	Developed by Johabu <http://johabu.spheniscida.de>;
-				<http://github.com/johabu>
-	
-	This file is part of VocabC.
-	VocabC is free software; you can modify it or redistribute it 
-	under the terms of the GNU General Public License as published by
-	the Free Software Foundation <http://www.fsf.org>, either version 3,
-	or (at your option) any later version.
-	See <http://www.gnu.org/licenses> for the license, if you
-	haven't received a copy of it (GNU_GPL.txt).
-
-	VocabC is distributed without any warranty!
-
+Developed by Johabu <http://johabu.spheniscida.de>;<http://github.com/johabu>
+This file is part of VocabC.
+VocabC is free software; you can modify it or redistribute it 
+under the terms of the GNU General Public License as published by
+the Free Software Foundation <http://www.fsf.org>, either version 3,
+or (at your option) any later version.
+See <http://www.gnu.org/licenses> for the license, if you haven't received a copy of it (GNU\_GPL.txt).
+VocabC is distributed without any warranty!
 Platforms
 ----------
 
 version 2.1 works on GNU/Linux.
+
 version 2.2 works on GNU/Linux.
+
 version 2.3 works on GNU/Linux.
 
 Downloading and installing
@@ -27,15 +24,20 @@ First download the file (VocabC.zip or VocabC.tar.gz) and extract the files
 or clone the repository.
 
 1.	Compiling:
-	*Linux:
+	Linux:
+	
 	Type the following commands in a shell:
-	cd /PATH/TO/VocabC/
-	make install (you must have root rights)
+
+		cd /PATH/TO/VocabC/
+		make install 
+	(you must have root rights)
 	For a local install in one directory use
 	`make localinstall`
-	*Windows:
+
+	Windows:
 	Compile the files, e.g. with your Visual Studio Express or a Intel
-	C/C++ compiler. Note: On Windows special characters like 
+	C/C++ compiler. Note: On Windows special characters like umlauts or accented characters
+	don't work
 
 2.	Configuration:
 	When running `make install` the program creates an config file
@@ -74,27 +76,31 @@ The output of VocabC is displayed in the language stored in $LANG.
 	See also the vocabulary file "example.txt"
 
 2.	Start the program:
-	type:	VocabC -f <file>	
-		If this doesn't work, try ./VocabC -f <file> in the directory
-		in which you installed the program.
-		Check also your PATH variable.
+
+	type:	
+		VocabC -f <file>	
+
+	If this doesn't work, try `./VocabC -f <file>` in the directory
+	in which you installed the program.
+	Check also your PATH variable.
 	
 	Optional arguments:
-		-h		Show help
-		-r		Random order of words
-		-d1		Program asks the first word
-		-d2		Program asks the second word
-		-dr		Program sets direction randomly
-		-n <num>	ask <num> words
-		-s		case-sensitivity
-		-c		don't show comments
-		-x		ignore default settings stored in config file
+	*h	Show help
+	*r	Random order of words
+	*d1	Program asks the first word
+	*d2	Program asks the second word
+	*dr	Program sets direction randomly
+	*n <num>	ask <num> words
+	*s	case-sensitivity
+	*c	don't show comments
+	*x	ignore default settings stored in config file
 	
 	If you stored settings in a configuration file, you don't need to set 
 	optional arguments.
 	If you set some, settings from the configuration file are overwritten.
 
 3.	Behaviour of the program:
+
 	At first the program prints some information like the number of words 
 	which are going to be asked.
 	The program asks you for the word on the right side in the file.
