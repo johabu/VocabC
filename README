@@ -1,5 +1,5 @@
-=================================================================================
-	VocabC
+README for VocabC
+==================
 	Developed by Johabu <http://johabu.spheniscida.de>;
 				<http://github.com/johabu>
 	
@@ -13,39 +13,39 @@
 
 	VocabC is distributed without any warranty!
 
-=================================================================================
+Platforms
+----------
 
-=====================================README======================================
+version 2.1 works on GNU/Linux.
+version 2.2 works on GNU/Linux.
+version 2.3 works on GNU/Linux.
 
-version 2.0 is tested on Linux x86-64.
-version 2.1 is tested on Linux x86-64.
-version 2.2 is tested on Linux x86-64.
-version 2.3 is tested on Linux x86-64.
-
-=============================Download and installing=============================
+Downloading and installing
+-----------------------------
 
 First download the file (VocabC.zip or VocabC.tar.gz) and extract the files
 or clone the repository.
 
-Compiling:
-	Linux:
-		Type the following commands in a shell:
-			cd /PATH/TO/VocabC/
-			make install (you must have root rights)
-		For a local install in one directory use
-			make localinstall
-	Windows:
-		Compile the files, e.g. with your Visual Studio Express or a Intel
-		C/C++ compiler.
+1.	Compiling:
+	*Linux:
+	Type the following commands in a shell:
+	cd /PATH/TO/VocabC/
+	make install (you must have root rights)
+	For a local install in one directory use
+	`make localinstall`
+	*Windows:
+	Compile the files, e.g. with your Visual Studio Express or a Intel
+	C/C++ compiler. Note: On Windows special characters like 
 
-Configuration:
-	When running 'make install' the program creates an config file
-	located in HOME/.config/vocabc/ . If not, copy "conf.txt" in this
+2.	Configuration:
+	When running `make install` the program creates an config file
+	located in `HOME/.config/vocabc/` . If not, copy "conf.txt" in this
 	directory and rename it into "config".
 	In the config file you can save your default settings, e.g. random
 	order by default. Look at this file to see which settings you can save.
 
-=======================================Use=======================================
+Use
+----
 
 VocabC is a simple vocabulary trainer. 
 One point is that you can use it with different languages.
@@ -53,21 +53,27 @@ One point is that you can use it with different languages.
 The output of VocabC is displayed in the language stored in $LANG.
 (At the moment 3 languages: english, german and spanish)
 
-1)	To use the program, first create a vocab file.
-		!!!	The vocab has to be in this format:	!!!
-		!!!		word1 =	 word2a, word2b		!!!
+1.	Creating vocabulary file
+	To use the program, first create a vocab file.
+	*The vocab has to be in this format:*	
+	`word1 = word2a, word2b`	
 	Example: file name is e.g. "voc_1.txt"
 
-	Personal =personnel,staff	#several meanings possible
-	#english-german/spanish		#comments with '#' 
-					(must be the first character in the line)
-	german   =deutsch,alemán	#many languages possible (ISO 8859-15)
-	to fit   =caber#in english	#spaces possible;
-					comments for one side possible
+		Personal =personnel,staff	
+		#english-german/spanish			
+		german   =deutsch,alemán	
+		to fit   =caber\#in english	
+	
+	*	several meanings possible
+	*	comments with `\#` (must be the first character in the line)
+	*	many languages possible (ISO 8859-15)
+	*	spaces possible
+	*	comments on both sides possible
+	
 
 	See also the vocabulary file "example.txt"
 
-2)	Start the program:
+2.	Start the program:
 	type:	VocabC -f <file>	
 		If this doesn't work, try ./VocabC -f <file> in the directory
 		in which you installed the program.
@@ -88,7 +94,7 @@ The output of VocabC is displayed in the language stored in $LANG.
 	optional arguments.
 	If you set some, settings from the configuration file are overwritten.
 
-3)	Use:
+3.	Behaviour of the program:
 	At first the program prints some information like the number of words 
 	which are going to be asked.
 	The program asks you for the word on the right side in the file.
@@ -98,30 +104,29 @@ The output of VocabC is displayed in the language stored in $LANG.
 	a word. Before asking for a word the program gives you information about
 	your progress and percentage of the words you knew.
 
-=====================================Errors======================================
+Errors
+-------
 
 Following error codes may occur:
 
-	0	You didn't specify a vocabulary file using the -f option.
+*	0	You didn't specify a vocabulary file using the -f option.
 		You have to specify a file name using VocabC -f <file>.
-	0x1	The file you specified could not be opened. 
+*	0x1	The file you specified could not be opened. 
 		Check if file exists and check permissions.
-	0x3	Error while reading the vocabulary file.
+*	0x3	Error while reading the vocabulary file.
 		Check if word pairs are in correct syntax and if file still
 		exists.
-	0x4	The error occured in reading your input. Maybe you pressed
+*	0x4	The error occured in reading your input. Maybe you pressed
 		a key combination like Crtl-D.
-	0x5	The program creats a temporary file. Program was unable to
+*	0x5	The program creats a temporary file. Program was unable to
 		delete this file.
-	0x6	The program couldn't clear the screen of your console.
-	0x7	Internal error.
-	0x8	At the given line in your vocabulary file there isn't a
+*	0x6	The program couldn't clear the screen of your console.
+*	0x7	Internal error.
+*	0x8	At the given line in your vocabulary file there isn't a
 		readable word pair.
-	0x9	The program was unable to get the $HOME variable, thus
+*	0x9	The program was unable to get the $HOME variable, thus
 		your configuration file couldn't be located.
-	0xa	The given command-line option requieres an argument.
-	0xb	The command-line option you entered doesn't exist.
-	0xc	This error occurs if you entered an option character the
+*	0xa	The given command-line option requieres an argument.
+*	0xc	This error occurs if you entered an option character the
 		program can't deal with.
 
-=============================================================================
