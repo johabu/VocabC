@@ -65,19 +65,24 @@ The output of VocabC is displayed in the language stored in $LANG.
 		#english-german/spanish			
 		german   =deutsch,alemán	
 		to fit   =caber\#in english	
-	
-	*	several meanings possible
-	*	comments with `\#` (must be the first character in the line)
-	*	many languages possible (ISO 8859-15)
-	*	spaces possible
-	*	comments on both sides possible
+
+	several meanings possible
+
+	comments with `\#` (must be the first character in the line)
+
+	many languages possible (ISO 8859-15)
+
+	spaces possible
+
+	comments on both sides possible
 	
 
 	See also the vocabulary file "example.txt"
 
 2.	Start the program:
 
-	type:	
+	type:
+	
 		VocabC -f <file>	
 
 	If this doesn't work, try `./VocabC -f <file>` in the directory
@@ -85,15 +90,23 @@ The output of VocabC is displayed in the language stored in $LANG.
 	Check also your PATH variable.
 	
 	Optional arguments:
-	*h	Show help
-	*r	Random order of words
-	*d1	Program asks the first word
-	*d2	Program asks the second word
-	*dr	Program sets direction randomly
-	*n <num>	ask <num> words
-	*s	case-sensitivity
-	*c	don't show comments
-	*x	ignore default settings stored in config file
+	h	Show help
+
+	r	Random order of words
+
+	d1	Program asks the first word
+
+	d2	Program asks the second word
+
+	dr	Program sets direction randomly
+
+	n <num>	ask <num> words
+
+	s	case-sensitivity
+
+	c	don't show comments
+
+	x	ignore default settings stored in config file
 	
 	If you stored settings in a configuration file, you don't need to set 
 	optional arguments.
