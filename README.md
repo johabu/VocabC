@@ -64,18 +64,17 @@ The output of VocabC is displayed in the language stored in $LANG.
 		Personal =personnel,staff	
 		#english-german/spanish			
 		german   =deutsch,alemán	
-		to fit   =caber\#in english	
+		to fit   =caber#in english	
 
 	several meanings possible
 
-	comments with `\#` (must be the first character in the line)
+	comments with `#` (must be the first character in the line)
 
 	many languages possible (ISO 8859-15)
 
 	spaces possible
 
-	comments on both sides possible
-	
+	comments on only one side  possible	
 
 	See also the vocabulary file "example.txt"
 
@@ -90,23 +89,24 @@ The output of VocabC is displayed in the language stored in $LANG.
 	Check also your PATH variable.
 	
 	Optional arguments:
-	h	Show help
 
-	r	Random order of words
+	`-h`	Show help
 
-	d1	Program asks the first word
+	`-r`	Random order of words
 
-	d2	Program asks the second word
+	`-d1`	Program asks the first word
 
-	dr	Program sets direction randomly
+	`-d2`	Program asks the second word
 
-	n <num>	ask <num> words
+	`-dr`	Program sets direction randomly
 
-	s	case-sensitivity
+	`-n <num>`	ask <num> words
 
-	c	don't show comments
+	`-s`	case-sensitivity
 
-	x	ignore default settings stored in config file
+	`-c`	don't show comments
+
+	`-x`	ignore default settings stored in config file
 	
 	If you stored settings in a configuration file, you don't need to set 
 	optional arguments.
