@@ -1,6 +1,6 @@
 README for VocabC
 ==================
-Developed by Johabu <http://johabu.spheniscida.de>;<http://github.com/johabu>
+Developed by Johabu <http://johabu.spheniscida.de>; <http://github.com/johabu>
 This file is part of VocabC.
 VocabC is free software; you can modify it or redistribute it 
 under the terms of the GNU General Public License as published by
@@ -10,21 +10,17 @@ See <http://www.gnu.org/licenses> for the license, if you haven't received a cop
 VocabC is distributed without any warranty!
 Platforms
 ----------
+Current version: 2.4
 
-version 2.1 works on GNU/Linux.
+version 2.x works on GNU/Linux systems with Kernel 3.x and gcc 4.7 (tested on Ubuntu 13.04; x86-64)
 
-version 2.2 works on GNU/Linux.
-
-version 2.3 works on GNU/Linux.
-
-Downloading and installing
------------------------------
+Installing
+-----------
 
 First download the file (VocabC.zip or VocabC.tar.gz) and extract the files
 or clone the repository.
 
 1.	Compiling:
-	Linux:
 	
 	Type the following commands in a shell:
 
@@ -33,11 +29,6 @@ or clone the repository.
 	(you must have root rights)
 	For a local install in one directory use
 	`make localinstall`
-
-	Windows:
-	Compile the files, e.g. with your Visual Studio Express or a Intel
-	C/C++ compiler. Note: On Windows special characters like umlauts or accented characters
-	don't work
 
 2.	Configuration:
 	When running `make install` the program creates an config file
@@ -49,11 +40,12 @@ or clone the repository.
 Use
 ----
 
-VocabC is a simple vocabulary trainer. 
-One point is that you can use it with different languages.
+VocabC is a simple vocabulary trainer written in C. 
+One point is that you can use it for learning words or phrases
+of many different languages.
 
 The output of VocabC is displayed in the language stored in $LANG.
-(At the moment 3 languages: english, german and spanish)
+(At the moment 3 languages: English, German and Spanish)
 
 1.	Creating vocabulary file
 	To use the program, first create a vocab file.

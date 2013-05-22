@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -W -Wall -O2 -g3
+CFLAGS = -W -Wall -O2 
 BINDIR = /usr/local/bin
 NAME = VocabC
 

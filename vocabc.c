@@ -9,7 +9,7 @@
 #define MAX_WORDS 5
 #define MAX_TRIES 2
 #define MAX_LENGTH 256
-#define VERSION "2.3"
+#define VERSION "2.4"
 
 
 FILE *vocabfile;
@@ -222,7 +222,7 @@ int main(int argc, char **argv) {
 	unsigned int pairs = 0, pair = 1, lines = 0, word = 0;
 	//loop variables
 	unsigned int i, j, l, k = 0;
-	int is_giv, index_a, index_b, temp_rand;
+	int is_giv, index_a, index_b, temp_line;
 	unsigned int right = 0, correct = 0, tries = 0;
 	char direction[2] = "1";
 	float percent;
@@ -302,12 +302,12 @@ int main(int argc, char **argv) {
 	}
 	//if -r is set, shuffle array
 	if (User_settings.rvalue == 1) {
-		for (i = 0; i < 5000; i++) {
+		for (i = 0; i < 10000; i++) {
 			index_a = rand() % lines;
 			index_b = rand() % lines;
-			temp_rand = rand_lines[index_a];
+			temp_line = rand_lines[index_a];
 			rand_lines[index_a] = rand_lines[index_b];
-			rand_lines[index_b] = temp_rand;
+			rand_lines[index_b] = temp_line;
 		}
 	}
 	//How many words should be asked?
@@ -337,6 +337,7 @@ int main(int argc, char **argv) {
 	if (User_settings.cvalue == 1) { printf(" %s\n|",status_strings[lang][COMMENT]); }
 	printf(" %d %s\n",pairs,status_strings[lang][PAIRS]);
 	printf("------------------------------------------------------------------------\n\n");
+
 	//main loop with query
 	for (i = 0; i < pairs; i++) {
 		strcpy(comm_str,"NULL");
@@ -571,7 +572,8 @@ int init(void) {
 	configfile = fopen(conf_dir,"r");
 	if (configfile != NULL) {
 		printf("Configfile already exists. Do you want to overwrite it? (yes/NO)\n");
-		fgets(overwrite, 5, stdin);
+		if(fgets(overwrite, 5, stdin) == NULL)
+			strcpy(overwrite, "NO");
 		size_t len=strlen(overwrite);
 		overwrite[len-1]='\0';
 		if (strcmp(overwrite,"yes") == 0) {
