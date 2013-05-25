@@ -7,3 +7,4 @@ brother		=frère
 example		=esempio
 money		=Geld
 to fit		=caber
+#STATS#10#0.500#0.750#

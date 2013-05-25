@@ -228,6 +228,11 @@ int main(int argc, char **argv) {
 	float percent;
 	//variables for bar
 	float bar_num, bar_loop;
+	//variables for statistics
+	unsigned int stat_line_num = 0, query_num = 0;
+	char stat_line[MAX_LENGTH];
+	char stats[5][MAX_LENGTH];
+	float best_percentage = 0, average_percentage = 0;
 	/*****END OF VARIABLES*****/
 
 	if (argc < 2) {
@@ -285,6 +290,31 @@ int main(int argc, char **argv) {
 			fputs(buffer, vocabfile);
 		}
 	}
+	//read statistics of vocabulary file
+	i = 0;
+	fseek(sourcefile,0L,SEEK_SET);
+	while (fgets(buffer, MAX_LENGTH, sourcefile) != NULL ) {
+		if (strstr(buffer,"#STATS#") != 0 ) {
+			//printf("Line %d:\t %s\n", i, buffer);
+			strcpy(stat_line,buffer);
+			stat_line_num = i;
+		}
+		i++;
+	}
+	ptr = strtok(stat_line, "#");
+	i = 0;
+	while(ptr != NULL) {
+		strcpy(stats[i], ptr);
+		//printf("| %s\n",ptr);
+		ptr = strtok(NULL, "#");
+		i++;
+	}
+	query_num = atoi(stats[1]);
+	printf("| Number of queries: %d\n",query_num);
+	average_percentage = strtof(stats[2], NULL) * 100;
+	best_percentage = strtof(stats[3], NULL) * 100;
+	printf("| Average percentage: %g%%\n| Best percentage: %g%%\n\n", average_percentage, best_percentage);
+
 	//reopen temporary file to read lines
 	if (freopen("vocab.tmp","r",vocabfile) == NULL) {
 		Error(7);
@@ -540,6 +570,8 @@ int main(int argc, char **argv) {
 	}
 	percent = (float) right / (float) pairs * 100;
 	printf("\n| %s %g%% (%d/%d) %s.\n\n",query_strings[lang][ANALYSIS1],percent,right,pairs,query_strings[lang][ANALYSIS2]);
+
+	
 	//End of program, close files, remove temporary file
 	fclose(vocabfile);
 	fclose(sourcefile);
