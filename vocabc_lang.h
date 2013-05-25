@@ -11,6 +11,7 @@
 #define PROGRESS 6
 #define ANALYSIS1 7
 #define ANALYSIS2 8
+#define ALL_CORR 9
 
 #define VERS 0
 #define DEVELOP 1

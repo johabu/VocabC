@@ -522,6 +522,9 @@ int main(int argc, char **argv) {
 			//display "correct" or "wrong"
 			if (correct == 1) {
 				printf("| %s",query_strings[lang][CORRECT]);
+				if (strcmp(direction,"2") != 0) {
+					printf("\t%s: \"%s\"",query_strings[lang][ALL_CORR] ,lang2_str);
+				}
 				right++;
 			} else {
 				printf("| %s",query_strings[lang][WRONG]);

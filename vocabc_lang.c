@@ -11,6 +11,7 @@
 #define PROGRESS 6
 #define ANALYSIS1 7
 #define ANALYSIS2 8
+#define ALL_CORR 9
 
 #define VERS 0
 #define DEVELOP 1
@@ -26,9 +27,9 @@
 #define EXIT 0
 
 char *query_strings[3][10] = {
-	{"Correct!","Wrong!","Correct was","word","of","known","progress","You have known","of the words"},
-	{"Richtig!","Falsch!","Korrekt ist","Wort","von","Bereits gewusst","Fortschritt","Du wusstest","der Wörter"},
-	{"¡Correcto!","¡Falso!","Correcto es","Palabra","de","Ya sabiendo","Progreso","Sabías","de las palabras"},
+	{"Correct!","Wrong!","Correct was","word","of","known","progress","You have known","of the words","All correct meanings"},
+	{"Richtig!","Falsch!","Korrekt ist","Wort","von","Bereits gewusst","Fortschritt","Du wusstest","der Wörter","Alle korrekten Bedeutungen"},
+	{"¡Correcto!","¡Falso!","Correcto es","Palabra","de","Ya sabiendo","Progreso","Sabías","de las palabras","Todos conceptos correctos"},
 };
 
 char *status_strings[3][10] = {
