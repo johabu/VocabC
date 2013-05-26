@@ -295,7 +295,6 @@ int main(int argc, char **argv) {
 	fseek(sourcefile,0L,SEEK_SET);
 	while (fgets(buffer, MAX_LENGTH, sourcefile) != NULL ) {
 		if (strstr(buffer,"#STATS#") != 0 ) {
-			//printf("Line %d:\t %s\n", i, buffer);
 			strcpy(stat_line,buffer);
 			stat_line_num = i;
 		}
@@ -305,15 +304,16 @@ int main(int argc, char **argv) {
 	i = 0;
 	while(ptr != NULL) {
 		strcpy(stats[i], ptr);
-		//printf("| %s\n",ptr);
 		ptr = strtok(NULL, "#");
 		i++;
 	}
 	query_num = atoi(stats[1]);
-	printf("| Number of queries: %d\n",query_num);
 	average_percentage = strtof(stats[2], NULL) * 100;
 	best_percentage = strtof(stats[3], NULL) * 100;
-	printf("| Average percentage: %g%%\n| Best percentage: %g%%\n\n", average_percentage, best_percentage);
+	if (strcmp(stats[0], "STATS") != 0) {
+		freopen(User_settings.fvalue,"a",sourcefile);
+		fprintf(sourcefile, "#STATS#0#0#0#\n");
+	}
 
 	//reopen temporary file to read lines
 	if (freopen("vocab.tmp","r",vocabfile) == NULL) {
@@ -352,7 +352,7 @@ int main(int argc, char **argv) {
 		//Error(2);
 		pairs = lines;
 	}
-	//First output of the program - options which set are displayed
+	//First output of the program - status information  are displayed
 	printf("------------------------------------------------------------------------\n");
 	printf("| VocabC - %s %s   %s <https://github.com/johabu>\n|\n",status_strings[lang][VERS],VERSION,status_strings[lang][DEVELOP]);
 	printf("| %s:\n| %s: %s\n|",status_strings[lang][STATUS],status_strings[lang][VOCFILE],User_settings.fvalue);
@@ -366,6 +366,8 @@ int main(int argc, char **argv) {
 	}
 	if (User_settings.cvalue == 1) { printf(" %s\n|",status_strings[lang][COMMENT]); }
 	printf(" %d %s\n",pairs,status_strings[lang][PAIRS]);
+	printf("| %s: %d\n",status_strings[lang][QUERY_NUM], query_num);
+	printf("| %s: %g%%\n| %s: %g%%\n\n", status_strings[lang][AV_PER], average_percentage, status_strings[lang][TOP_PER], best_percentage);
 	printf("------------------------------------------------------------------------\n\n");
 
 	//main loop with query

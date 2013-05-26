@@ -22,13 +22,16 @@
 #define BOTH 7
 #define COMMENT 8
 #define PAIRS 9
+#define QUERY_NUM 10
+#define AV_PER 11
+#define TOP_PER 12
 
 #define EXIT 0
 
 extern char *query_strings[3][10];
 
-extern char *status_strings[3][10];
+extern char *status_strings[3][13];
 
-extern char *program_strings[3][3];
+extern char *program_strings[3][1];
 
 #endif

@@ -22,6 +22,9 @@
 #define BOTH 7
 #define	COMMENT 8
 #define PAIRS 9
+#define QUERY_NUM 10
+#define AV_PER 11
+#define TOP_PER 12
 
 #define EXIT 0
 
@@ -31,13 +34,13 @@ char *query_strings[3][10] = {
 	{"¡Correcto!","¡Falso!","Correcto es","Palabra","de","Ya sabiendo","Progreso","Sabías","de las palabras"},
 };
 
-char *status_strings[3][10] = {
-	{"version","Developed by Johabu","Status","Vocabulary file","Random order set","Case sensitivity set","Direction","both","Comments will be displayed","pairs will be asked"},
-	{"Version","Entwickelt von Johabu","Status","Vokabeldatei","Zufällige Wortreihenfolge","Groß-/Kleinschreibung wird unterschieden","Abfragerichtung","beide","Kommentare werden angezeigt","Wortpaare werden abgefragt"},
-	{"versión","Desarrollado de Johabu","Estado","Archivo de vocablos","Orden casual","Sensible al uso de mayúsculas y minúsculas","Dirección","ambos","comentarios se muestran","pares"},
+char *status_strings[3][13] = {
+	{"version","Developed by Johabu","Status","Vocabulary file","Random order set","Case sensitivity set","Direction","both","Comments will be displayed","pairs will be asked","Number of queries","Average percentage","Best percentage"},
+	{"Version","Entwickelt von Johabu","Status","Vokabeldatei","Zufällige Wortreihenfolge","Groß-/Kleinschreibung wird unterschieden","Abfragerichtung","beide","Kommentare werden angezeigt","Wortpaare werden abgefragt","Number of queries","Average percentage","Best percentage"},
+	{"versión","Desarrollado de Johabu","Estado","Archivo de vocablos","Orden casual","Sensible al uso de mayúsculas y minúsculas","Dirección","ambos","comentarios se muestran","pares","Number of queries","Average percentage","Best percentage"},
 };
 
-char *program_strings[3][3] = {
+char *program_strings[3][1] = {
 	{"Press 'Enter' to exit"},
 	{"Drücke 'Enter' zum Beenden"},
 	{"Oprima la tecla 'Enter'"},
