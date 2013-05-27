@@ -25,6 +25,10 @@
 #define QUERY_NUM 10
 #define AV_PER 11
 #define TOP_PER 12
+#define NEW_BEST 13
+#define OLD 14
+#define OLD_AV 15
+#define NEW_AV 16
 
 #define EXIT 0
 
@@ -34,10 +38,10 @@ char *query_strings[3][10] = {
 	{"¡Correcto!","¡Falso!","Correcto es","Palabra","de","Ya sabiendo","Progreso","Sabías","de las palabras"},
 };
 
-char *status_strings[3][13] = {
-	{"version","Developed by Johabu","Status","Vocabulary file","Random order set","Case sensitivity set","Direction","both","Comments will be displayed","pairs will be asked","Number of queries","Average percentage","Best percentage"},
-	{"Version","Entwickelt von Johabu","Status","Vokabeldatei","Zufällige Wortreihenfolge","Groß-/Kleinschreibung wird unterschieden","Abfragerichtung","beide","Kommentare werden angezeigt","Wortpaare werden abgefragt","Number of queries","Average percentage","Best percentage"},
-	{"versión","Desarrollado de Johabu","Estado","Archivo de vocablos","Orden casual","Sensible al uso de mayúsculas y minúsculas","Dirección","ambos","comentarios se muestran","pares","Number of queries","Average percentage","Best percentage"},
+char *status_strings[3][17] = {
+	{"version","Developed by Johabu","Status","Vocabulary file","Random order set","Case sensitivity set","Direction","both","Comments will be displayed","pairs will be asked","Number of queries","Average percentage","Best percentage","New BEST percentage","Old","Old average","New average"},
+	{"Version","Entwickelt von Johabu","Status","Vokabeldatei","Zufällige Wortreihenfolge","Groß-/Kleinschreibung wird unterschieden","Abfragerichtung","beide","Kommentare werden angezeigt","Wortpaare werden abgefragt","Number of queries","Average percentage","Best percentage","New BEST percentage","Old","Old average","New average"},
+	{"versión","Desarrollado de Johabu","Estado","Archivo de vocablos","Orden casual","Sensible al uso de mayúsculas y minúsculas","Dirección","ambos","comentarios se muestran","pares","Number of queries","Average percentage","Best percentage","New BEST percentage","Old","Old average","New average"},
 };
 
 char *program_strings[3][1] = {

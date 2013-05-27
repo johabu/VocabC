@@ -25,12 +25,16 @@
 #define QUERY_NUM 10
 #define AV_PER 11
 #define TOP_PER 12
+#define NEW_BEST 13
+#define OLD 14
+#define OLD_AV 15
+#define NEW_AV 16
 
 #define EXIT 0
 
 extern char *query_strings[3][10];
 
-extern char *status_strings[3][13];
+extern char *status_strings[3][17];
 
 extern char *program_strings[3][1];
 

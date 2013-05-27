@@ -578,12 +578,12 @@ int main(int argc, char **argv) {
 	printf("\n| %s %g%% (%d/%d) %s.\n",query_strings[lang][ANALYSIS1],percent,right,pairs,query_strings[lang][ANALYSIS2]);
 
 	if (percent > best_percentage) {
-		printf("| New BEST percentage: %.1f%%\tOld: %.1f%%\n", percent, best_percentage);
+		printf("| %s: %.1f%%\t%s: %.1f%%\n",status_strings[lang][NEW_BEST], percent, status_strings[lang][OLD], best_percentage);
 		best_percentage = percent;
 	}
-	printf("| Old average: %.1f%%\n",average_percentage);
+	printf("| %s: %.1f%%\n", status_strings[lang][OLD_AV], average_percentage);
 	average_percentage = ((average_percentage * query_num) + percent) / (query_num + 1);
-	printf("| New average: %.1f%%\n",average_percentage);
+	printf("| %s: %.1f%%\n", status_strings[lang][NEW_AV], average_percentage);
 	//Write new statictics in file using temporary file and renaming it later 
 	strncpy(source_temp_str, User_settings.fvalue, 100);
 	strncat(source_temp_str, ".tmp", 10);
