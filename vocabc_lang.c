@@ -23,6 +23,13 @@
 #define BOTH 7
 #define	COMMENT 8
 #define PAIRS 9
+#define QUERY_NUM 10
+#define AV_PER 11
+#define TOP_PER 12
+#define NEW_BEST 13
+#define OLD 14
+#define OLD_AV 15
+#define NEW_AV 16
 
 #define EXIT 0
 
@@ -32,13 +39,13 @@ char *query_strings[3][10] = {
 	{"¡Correcto!","¡Falso!","Correcto es","Palabra","de","Ya sabiendo","Progreso","Sabías","de las palabras","Todos conceptos correctos"},
 };
 
-char *status_strings[3][10] = {
-	{"version","Developed by Johabu","Status","Vocabulary file","Random order set","Case sensitivity set","Direction","both","Comments will be displayed","pairs will be asked"},
-	{"Version","Entwickelt von Johabu","Status","Vokabeldatei","Zufällige Wortreihenfolge","Groß-/Kleinschreibung wird unterschieden","Abfragerichtung","beide","Kommentare werden angezeigt","Wortpaare werden abgefragt"},
-	{"versión","Desarrollado de Johabu","Estado","Archivo de vocablos","Orden casual","Sensible al uso de mayúsculas y minúsculas","Dirección","ambos","comentarios se muestran","pares"},
+char *status_strings[3][17] = {
+	{"version","Developed by Johabu","Status","Vocabulary file","Random order set","Case sensitivity set","Direction","both","Comments will be displayed","pairs will be asked","Number of queries","Average percentage","Best percentage","NEW best percentage","Old","Old average","New average"},
+	{"Version","Entwickelt von Johabu","Status","Vokabeldatei","Zufällige Wortreihenfolge","Groß-/Kleinschreibung wird unterschieden","Abfragerichtung","beide","Kommentare werden angezeigt","Wortpaare werden abgefragt","Anzahl von Abfragen","Durchschnittlicher Prozentsatz","Bester Prozentsatz","NEUER bester Prozentsatz","Alter","Alter Durchschnitt","Neuer Durchschnitt"},
+	{"versión","Desarrollado de Johabu","Estado","Archivo de vocablos","Orden casual","Sensible al uso de mayúsculas y minúsculas","Dirección","ambos","comentarios se muestran","pares","Numero de interrogaciónes","Porcentaje de promedio","Porcentaje mejor","NUEVO porcentaje mejor","Antiguo","Promedia antiguo","Promedio nuevo"},
 };
 
-char *program_strings[3][3] = {
+char *program_strings[3][1] = {
 	{"Press 'Enter' to exit"},
 	{"Drücke 'Enter' zum Beenden"},
 	{"Oprima la tecla 'Enter'"},

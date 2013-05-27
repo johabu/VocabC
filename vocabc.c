@@ -1,4 +1,5 @@
 #include <stdlib.h>
+
 #include <stdio.h>
 #include <unistd.h>
 #include <ctype.h>
@@ -14,6 +15,7 @@
 
 FILE *vocabfile;
 FILE *sourcefile;
+FILE *source_temp;
 FILE *config;
 int glo_var;
 int lang;
@@ -228,6 +230,12 @@ int main(int argc, char **argv) {
 	float percent;
 	//variables for bar
 	float bar_num, bar_loop;
+	//variables for statistics
+	unsigned int stat_line_num = 0, query_num = 0;
+	char stat_line[MAX_LENGTH];
+	char stats[5][MAX_LENGTH];
+	float best_percentage = 0, average_percentage = 0;
+        char source_temp_str[100];
 	/*****END OF VARIABLES*****/
 
 	if (argc < 2) {
@@ -285,6 +293,32 @@ int main(int argc, char **argv) {
 			fputs(buffer, vocabfile);
 		}
 	}
+	//read statistics of vocabulary file
+	i = 0;
+	fseek(sourcefile,0L,SEEK_SET);
+	while (fgets(buffer, MAX_LENGTH, sourcefile) != NULL ) {
+		if (strstr(buffer,"#STATS#") != 0 ) {
+			strcpy(stat_line,buffer);
+			stat_line_num = i;
+		}
+		i++;
+	}
+	ptr = strtok(stat_line, "#");
+	i = 0;
+	while(ptr != NULL) {
+		strcpy(stats[i], ptr);
+		ptr = strtok(NULL, "#");
+		i++;
+	}
+	query_num = atoi(stats[1]);
+	average_percentage = strtof(stats[2], NULL) * 100;
+	best_percentage = strtof(stats[3], NULL) * 100;
+	if (strcmp(stats[0], "STATS") != 0) {
+		if (freopen(User_settings.fvalue,"a",sourcefile) == NULL )
+			Error(1);
+		fprintf(sourcefile, "#STATS#0#0#0#\n");
+	}
+
 	//reopen temporary file to read lines
 	if (freopen("vocab.tmp","r",vocabfile) == NULL) {
 		Error(7);
@@ -322,7 +356,7 @@ int main(int argc, char **argv) {
 		//Error(2);
 		pairs = lines;
 	}
-	//First output of the program - options which set are displayed
+	//First output of the program - status information  are displayed
 	printf("------------------------------------------------------------------------\n");
 	printf("| VocabC - %s %s   %s <https://github.com/johabu>\n|\n",status_strings[lang][VERS],VERSION,status_strings[lang][DEVELOP]);
 	printf("| %s:\n| %s: %s\n|",status_strings[lang][STATUS],status_strings[lang][VOCFILE],User_settings.fvalue);
@@ -336,6 +370,8 @@ int main(int argc, char **argv) {
 	}
 	if (User_settings.cvalue == 1) { printf(" %s\n|",status_strings[lang][COMMENT]); }
 	printf(" %d %s\n",pairs,status_strings[lang][PAIRS]);
+	printf("| %s: %d\n",status_strings[lang][QUERY_NUM], query_num);
+	printf("| %s: %g%%\n| %s: %g%%\n\n", status_strings[lang][AV_PER], average_percentage, status_strings[lang][TOP_PER], best_percentage);
 	printf("------------------------------------------------------------------------\n\n");
 
 	//main loop with query
@@ -542,14 +578,36 @@ int main(int argc, char **argv) {
 		pair++;
 	}
 	percent = (float) right / (float) pairs * 100;
-	printf("\n| %s %g%% (%d/%d) %s.\n\n",query_strings[lang][ANALYSIS1],percent,right,pairs,query_strings[lang][ANALYSIS2]);
+	printf("\n| %s %g%% (%d/%d) %s.\n",query_strings[lang][ANALYSIS1],percent,right,pairs,query_strings[lang][ANALYSIS2]);
+
+	if (percent > best_percentage) {
+		printf("| %s: %.1f%%\t%s: %.1f%%\n",status_strings[lang][NEW_BEST], percent, status_strings[lang][OLD], best_percentage);
+		best_percentage = percent;
+	}
+	printf("| %s: %.1f%%\n", status_strings[lang][OLD_AV], average_percentage);
+	average_percentage = ((average_percentage * query_num) + percent) / (query_num + 1);
+	printf("| %s: %.1f%%\n", status_strings[lang][NEW_AV], average_percentage);
+	//Write new statictics in file using temporary file and renaming it later 
+	strncpy(source_temp_str, User_settings.fvalue, 100);
+	strncat(source_temp_str, ".tmp", 10);
+	source_temp = fopen(source_temp_str, "w");
+	fseek(sourcefile,0L,SEEK_SET);
+	i = 0;
+	while(((fgets(buffer, sizeof(buffer), sourcefile)) != NULL) && (i < stat_line_num))  {
+		fputs(buffer, source_temp);
+		i++;
+	}
+	query_num++;
+	fprintf(source_temp, "#STATS#%d#%.3f#%.3f#\n",query_num, (average_percentage / 100), (best_percentage / 100));
+	fclose(source_temp);
 	//End of program, close files, remove temporary file
 	fclose(vocabfile);
 	fclose(sourcefile);
+	rename(source_temp_str, User_settings.fvalue);
 	if (remove("vocab.tmp") < 0) {
 		Error(5);
 	}
-	printf("| %s...\n",program_strings[lang][EXIT]);
+	printf("\n| %s...\n",program_strings[lang][EXIT]);
 	getchar();
        	return EXIT_SUCCESS;
 }
