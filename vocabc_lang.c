@@ -39,9 +39,9 @@ char *query_strings[3][10] = {
 };
 
 char *status_strings[3][17] = {
-	{"version","Developed by Johabu","Status","Vocabulary file","Random order set","Case sensitivity set","Direction","both","Comments will be displayed","pairs will be asked","Number of queries","Average percentage","Best percentage","New BEST percentage","Old","Old average","New average"},
-	{"Version","Entwickelt von Johabu","Status","Vokabeldatei","Zufällige Wortreihenfolge","Groß-/Kleinschreibung wird unterschieden","Abfragerichtung","beide","Kommentare werden angezeigt","Wortpaare werden abgefragt","Number of queries","Average percentage","Best percentage","New BEST percentage","Old","Old average","New average"},
-	{"versión","Desarrollado de Johabu","Estado","Archivo de vocablos","Orden casual","Sensible al uso de mayúsculas y minúsculas","Dirección","ambos","comentarios se muestran","pares","Number of queries","Average percentage","Best percentage","New BEST percentage","Old","Old average","New average"},
+	{"version","Developed by Johabu","Status","Vocabulary file","Random order set","Case sensitivity set","Direction","both","Comments will be displayed","pairs will be asked","Number of queries","Average percentage","Best percentage","NEW best percentage","Old","Old average","New average"},
+	{"Version","Entwickelt von Johabu","Status","Vokabeldatei","Zufällige Wortreihenfolge","Groß-/Kleinschreibung wird unterschieden","Abfragerichtung","beide","Kommentare werden angezeigt","Wortpaare werden abgefragt","Anzahl von Abfragen","Durchschnittlicher Prozentsatz","Bester Prozentsatz","NEUER bester Prozentsatz","Alter","Alter Durchschnitt","Neuer Durchschnitt"},
+	{"versión","Desarrollado de Johabu","Estado","Archivo de vocablos","Orden casual","Sensible al uso de mayúsculas y minúsculas","Dirección","ambos","comentarios se muestran","pares","Numero de interrogaciónes","Porcentaje de promedio","Porcentaje mejor","NUEVO porcentaje mejor","Antiguo","Promedia antiguo","Promedio nuevo"},
 };
 
 char *program_strings[3][1] = {
