@@ -317,7 +317,12 @@ int main(int argc, char **argv) {
 	if (strcmp(stats[0], "STATS") != 0) {
 		if (freopen(User_settings.fvalue,"a+",sourcefile) == NULL )
 			Error(1);
-		fputs("#STATS#0#0#0#\n", sourcefile);
+		fseek(sourcefile, -1L, SEEK_END);
+		if (fgetc(sourcefile) == '\n') {
+			fputs("#STATS#0#0#0#\n", sourcefile);
+		} else {
+			fputs("\n#STATS#0#0#0#\n", sourcefile);
+		}
 		i = 0;
         	fseek(sourcefile, 0L, SEEK_SET);
         	while (fgets(buffer, MAX_LENGTH, sourcefile) != NULL ) {
@@ -328,7 +333,6 @@ int main(int argc, char **argv) {
         	        i++;
         	}
 	}
-	printf("%d",stat_line_num);
 	//reopen temporary file to read lines
 	if (freopen("vocab.tmp","r",vocabfile) == NULL) {
 		Error(7);
