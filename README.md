@@ -114,6 +114,8 @@ The output of VocabC is displayed in the language stored in $LANG.
 	Be careful with the spelling! You have two tries, e.g. if you misspelled
 	a word. Before asking for a word the program gives you information about
 	your progress and percentage of the words you knew.
+	In the end it shows you statistics about your knowledge, which are stored
+	in each vocabulary file as well.
 
 Errors
 -------
