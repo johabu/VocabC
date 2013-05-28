@@ -10,7 +10,7 @@ See <http://www.gnu.org/licenses> for the license, if you haven't received a cop
 VocabC is distributed without any warranty!
 Platforms
 ----------
-Current version: 2.4
+Current version: 2.5
 
 version 2.x works on GNU/Linux systems with Kernel 3.x and gcc 4.7 (tested on Ubuntu 13.04; x86-64)
 
