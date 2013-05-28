@@ -295,7 +295,7 @@ int main(int argc, char **argv) {
 	}
 	//read statistics of vocabulary file
 	i = 0;
-	fseek(sourcefile,0L,SEEK_SET);
+	fseek(sourcefile, 0L, SEEK_SET);
 	while (fgets(buffer, MAX_LENGTH, sourcefile) != NULL ) {
 		if (strstr(buffer,"#STATS#") != 0 ) {
 			strcpy(stat_line,buffer);
@@ -313,12 +313,22 @@ int main(int argc, char **argv) {
 	query_num = atoi(stats[1]);
 	average_percentage = strtof(stats[2], NULL) * 100;
 	best_percentage = strtof(stats[3], NULL) * 100;
+	//first query? -> adding statistic-string
 	if (strcmp(stats[0], "STATS") != 0) {
-		if (freopen(User_settings.fvalue,"a",sourcefile) == NULL )
+		if (freopen(User_settings.fvalue,"a+",sourcefile) == NULL )
 			Error(1);
-		fprintf(sourcefile, "#STATS#0#0#0#\n");
+		fputs("#STATS#0#0#0#\n", sourcefile);
+		i = 0;
+        	fseek(sourcefile, 0L, SEEK_SET);
+        	while (fgets(buffer, MAX_LENGTH, sourcefile) != NULL ) {
+        	        if (strstr(buffer,"#STATS#") != 0 ) {
+        	                strcpy(stat_line,buffer);
+        	                stat_line_num = i;
+        	        }
+        	        i++;
+        	}
 	}
-
+	printf("%d",stat_line_num);
 	//reopen temporary file to read lines
 	if (freopen("vocab.tmp","r",vocabfile) == NULL) {
 		Error(7);
@@ -600,6 +610,7 @@ int main(int argc, char **argv) {
 	query_num++;
 	fprintf(source_temp, "#STATS#%d#%.3f#%.3f#\n",query_num, (average_percentage / 100), (best_percentage / 100));
 	fclose(source_temp);
+
 	//End of program, close files, remove temporary file
 	fclose(vocabfile);
 	fclose(sourcefile);
