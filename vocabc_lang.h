@@ -39,4 +39,6 @@ extern char *status_strings[3][17];
 
 extern char *program_strings[3][1];
 
+extern char *errors[3][15];
+
 #endif

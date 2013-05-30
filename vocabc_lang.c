@@ -33,22 +33,30 @@
 
 #define EXIT 0
 
+//strings used during query
 char *query_strings[3][10] = {
 	{"Correct!","Wrong!","Correct was","word","of","known","progress","You have known","of the words","All correct meanings"},
 	{"Richtig!","Falsch!","Korrekt ist","Wort","von","Bereits gewusst","Fortschritt","Du wusstest","der Wörter","Alle korrekten Bedeutungen"},
 	{"¡Correcto!","¡Falso!","Correcto es","Palabra","de","Ya sabiendo","Progreso","Sabías","de las palabras","Todos conceptos correctos"},
 };
-
+//Status informations
 char *status_strings[3][17] = {
 	{"version","Developed by Johabu","Status","Vocabulary file","Random order set","Case sensitivity set","Direction","both","Comments will be displayed","pairs will be asked","Number of queries","Average percentage","Best percentage","NEW best percentage","Old","Old average","New average"},
 	{"Version","Entwickelt von Johabu","Status","Vokabeldatei","Zufällige Wortreihenfolge","Groß-/Kleinschreibung wird unterschieden","Abfragerichtung","beide","Kommentare werden angezeigt","Wortpaare werden abgefragt","Anzahl von Abfragen","Durchschnittlicher Prozentsatz","Bester Prozentsatz","NEUER bester Prozentsatz","Alter","Alter Durchschnitt","Neuer Durchschnitt"},
 	{"versión","Desarrollado de Johabu","Estado","Archivo de vocablos","Orden casual","Sensible al uso de mayúsculas y minúsculas","Dirección","ambos","comentarios se muestran","pares","Numero de interrogaciónes","Porcentaje de promedio","Porcentaje mejor","NUEVO porcentaje mejor","Antiguo","Promedia antiguo","Promedio nuevo"},
 };
-
+//General strings
 char *program_strings[3][1] = {
 	{"Press 'Enter' to exit"},
 	{"Drücke 'Enter' zum Beenden"},
 	{"Oprima la tecla 'Enter'"},
+};
+
+//Errors which will be displayed
+char *errors[3][15] = {
+	{"VocabC requires argument -f <file>","Error in opening vocabulary file","too high argument of option -n","Error in reading vocabulary file","Error in input","Error in deleting temporary file","Unable to clear screen","Internal Error","Vocabfile doesn't contain a word pair in line","Unable to read $HOME","Err10","Err11","Err12"},
+	{"VocabC benötigt das Argument -f <Dateiname>","Fehler beim Öffnen der Vokabeldatei","Argument bei -n zu hoch","Fehler beim Einlesen der Vokabeldatei","Fehler in der Eingabe","Fehler beim Löschen der temporären Datei","Unfähig den Bildschirm zu löschen","Interner Fehler","Die Vokabeldatei enthält kein Wortpaar in Zeile","Unfähig $HOME einzulesen","Err10","Err11","Err12"},
+	{"VocabC requires argument -f <file>","Error in opening vocabulary file","too high argument of option -n","Error in reading vocabulary file","Error in input","Error in deleting temporary file","Unable to clear screen","Internal Error","Vocabfile doesn't contain a word pair in line","Unable to read $HOME","Err10","Err11","Err12"},
 };
 
 #endif

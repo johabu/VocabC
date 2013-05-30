@@ -30,22 +30,19 @@ struct Options {
 	int xvalue;	// 0
 };
 
-//Errors which will be displayed
-char *errors[] = {"VocabC requires argument -f <file>","Error in opening vocabulary file","too high argument of option -n","Error in reading vocabulary file",
-			"Error in input","Error in deleting temporary file","Unable to clear screen","Internal Error","Err8","Unable to read $HOME",
-			"Err10","Err11","Err12"};
 //Init function (VocabC -i); code at the end of file
 int init(void);
 
 //Function for displaying an error
-int Error(int error) {
-	if (error == 8) {
-		printf("| Error %#x - Vocabfile doesn't contain a word pair at line %d!\n",error,glo_var);
+int Error(int error_num) {
+	if (error_num == 8) {
+		printf("| Error %#x - %s %d!\n", error_num, errors[lang][error_num], glo_var);
 	} else {
-		printf("| Error %#x - %s!\n",error,errors[error]);
+		printf("| Error %#x - %s!\n", error_num, errors[lang][error_num]);
 	}
-	if ((error != 0) && (remove("vocab.tmp") < 0)) {
+	if ((error_num != 0) && (remove("vocab.tmp") < 0)) {
 		fclose(vocabfile);
+		fclose(sourcefile);
 		remove("vocab.tmp");
 	}
 	printf("| %s...\n",program_strings[lang][EXIT]);
@@ -238,6 +235,17 @@ int main(int argc, char **argv) {
         char source_temp_str[100];
 	/*****END OF VARIABLES*****/
 
+	//get LANG variable
+	strncpy(lang_code, getenv("LANG"), 19);
+	lang_code[19] = '\0';
+	if (strstr(lang_code,"de") != NULL) {
+		lang = 1;
+	} else if (strstr(lang_code,"es") != NULL) {
+		lang = 2;
+	} else {
+		lang = 0;
+	}
+	//Program needs option -f
 	if (argc < 2) {
 		Error(0);
 	}
@@ -248,16 +256,6 @@ int main(int argc, char **argv) {
 		if (system("clear") == -1) {
 			Error(6);
 		}
-	}
-	//get LANG variable
-	strncpy(lang_code, getenv("LANG"), 19);
-	lang_code[19] = '\0';
-	if (strstr(lang_code,"de") != NULL) {
-		lang = 1;
-	} else if (strstr(lang_code,"es") != NULL) {
-		lang = 2;
-	} else {
-		lang = 0;
 	}
 	//get the HOME variable to locate the config file
 	strncpy(conf_dir, getenv("HOME"), 75);
@@ -384,8 +382,8 @@ int main(int argc, char **argv) {
 	}
 	if (User_settings.cvalue == 1) { printf(" %s\n|",status_strings[lang][COMMENT]); }
 	printf(" %d %s\n",pairs,status_strings[lang][PAIRS]);
-	printf("| %s: %d\n",status_strings[lang][QUERY_NUM], query_num);
-	printf("| %s: %g%%\n| %s: %g%%\n\n", status_strings[lang][AV_PER], average_percentage, status_strings[lang][TOP_PER], best_percentage);
+	printf("|\n| %s: %d\n",status_strings[lang][QUERY_NUM], query_num);
+	printf("| %s: %g%%\n| %s: %g%%\n", status_strings[lang][AV_PER], average_percentage, status_strings[lang][TOP_PER], best_percentage);
 	printf("------------------------------------------------------------------------\n\n");
 
 	//main loop with query
