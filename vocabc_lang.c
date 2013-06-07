@@ -32,6 +32,19 @@
 #define NEW_AV 16
 
 #define EXIT 0
+#define USE 1
+#define VFILE 2
+#define OPTARG 3
+#define HELP 4
+#define RAND 5
+#define D1 6
+#define D2 7
+#define DR 8
+#define NUM 9
+#define CASE_S 10
+#define IGN_COMM 11
+#define IGN_SET 12
+
 
 //strings used during query
 char *query_strings[3][10] = {
@@ -46,10 +59,10 @@ char *status_strings[3][17] = {
 	{"versión","Desarrollado de Johabu","Estado","Archivo de vocablos","Orden casual","Sensible al uso de mayúsculas y minúsculas","Dirección","ambos","comentarios se muestran","pares","Numero de interrogaciónes","Porcentaje de promedio","Porcentaje mejor","NUEVO porcentaje mejor","Antiguo","Promedia antiguo","Promedio nuevo"},
 };
 //General strings
-char *program_strings[3][1] = {
-	{"Press 'Enter' to exit"},
-	{"Drücke 'Enter' zum Beenden"},
-	{"Oprima la tecla 'Enter'"},
+char *program_strings[3][13] = {
+	{"Press 'Enter' to exit","Usage","file","Optional Arguments","Show this help","Randomize the order of word pairs","The program asks the word from the left side of the vocabulary file","The program asks one word from the right side of the vocabulary file","The program asks randomly from the left and the right side","Ask only <num> words","Case sensitive","Don't display comments","Ignore settings stored in configuration file (~/.config/vocabc/config)"},
+	{"Drücke 'Enter' zum Beenden","Usage","file","Optional Arguments","Show this help","Randomize the order of word pairs","The program asks the word from the left side of the vocabulary file","The program asks one word from the right side of the vocabulary file","The program asks randomly from the left and the right side","Ask only <num> words","Case sensitive","Don't display comments","Ignore settings stored in configuration file (~/.config/vocabc/config)"},
+	{"Oprima la tecla 'Enter'","Use","file","Optional Arguments","Show this help","Randomize the order of word pairs","The program asks the word from the left side of the vocabulary file","The program asks one word from the right side of the vocabulary file","The program asks randomly from the left and the right side","Ask only <num> words","Case sensitive","Don't display comments","Ignore settings stored in configuration file (~/.config/vocabc/config)"},
 };
 
 //Errors which will be displayed

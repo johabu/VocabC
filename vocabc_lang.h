@@ -32,12 +32,25 @@
 #define NEW_AV 16
 
 #define EXIT 0
+#define USE 1
+#define VFILE 2
+#define OPTARG 3
+#define HELP 4
+#define RAND 5
+#define D1 6
+#define D2 7
+#define DR 8
+#define NUM 9
+#define CASE_S 10
+#define IGN_COMM 11
+#define IGN_SET 12
+
 
 extern char *query_strings[3][10];
 
 extern char *status_strings[3][17];
 
-extern char *program_strings[3][1];
+extern char *program_strings[3][13];
 
 extern char *errors[3][15];
 

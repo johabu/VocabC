@@ -32,6 +32,7 @@ struct Options {
 
 //Init function (VocabC -i); code at the end of file
 int init(void);
+void Print_help(void);
 
 //Function for displaying an error
 int Error(int error_num) {
@@ -45,9 +46,21 @@ int Error(int error_num) {
 		fclose(sourcefile);
 		remove("vocab.tmp");
 	}
+	Print_help();
 	printf("| %s...\n",program_strings[lang][EXIT]);
 	getchar();
 	exit(EXIT_FAILURE);
+}
+
+void Print_help(void) {
+	printf("\nVocabC %s\n",VERSION);
+	printf("\n%s: VocabC -f <%s> [-h] [-r] [-d1|-d2|-dr] [-n <num>] [-s] [-c] [-x]\n", program_strings[lang][USE],program_strings[lang][VFILE]);
+	printf("\n%s:\n-h\t\t: %s\n-r\t\t: %s\n", program_strings[lang][OPTARG], program_strings[lang][HELP], program_strings[lang][RAND]);
+	printf("-d1\t\t: %s\n-d2\t\t: %s\n-dr\t\t: %s\n", program_strings[lang][D1], program_strings[lang][D2], program_strings[lang][DR]);
+	printf("-n <num>\t: %s\n", program_strings[lang][NUM]);
+	printf("-s\t\t: %s\n", program_strings[lang][CASE_S]);
+	printf("-c\t\t: %s\n", program_strings[lang][IGN_COMM]);
+	printf("-x\t\t: %s\n\n", program_strings[lang][IGN_SET]);
 }
 
 //Read the options the user set when starting VocabC
@@ -59,14 +72,7 @@ struct Options Read_user_options (int argc, char **argv, struct Options User_opt
 	while ((CHAR = getopt (argc, argv, "hrf:d:n:scx")) != -1) {
 		switch (CHAR) {
           		case 'h':
-				printf("\nVocabC %s\n",VERSION);
-            			printf("\nUse:\tVocabC -f <file>\n");
-				printf("\nOptional arguments:\n-h\tShow this help\n-r\tRandomize the order of the words\n");
-				printf("-d1\tThe program asks the first word\n-d2\tThe program asks the second word\n-dr\tthe program asks randomly\n");
-				printf("-n <num>\tAsk only <num> words\n");
-				printf("-s\tCase sensitive\n");
-				printf("-c\tdon't display comments\n");
-				printf("-x\tignore settings stored in config file\n");
+				Print_help();
 				exit(EXIT_FAILURE);
             		case 'f':
 				strncpy(User_options.fvalue, optarg, 95);
@@ -94,13 +100,13 @@ struct Options Read_user_options (int argc, char **argv, struct Options User_opt
 				break;
            		case '?':
              			if (optopt == 'f' || optopt == 'd') {
-               				fprintf (stderr, "Error 0xa - Option -%c requires an argument.\n%s...\n", optopt, program_strings[lang][EXIT]);
+               				fprintf (stderr, "| Error 0xa - Option -%c requires an argument.\n| %s...\n", optopt, program_strings[lang][EXIT]);
 					getchar();
              			} else if (isprint (optopt)) {
-               				fprintf (stderr, "Error 0xb - Unknown option `-%c'.\n%s...\n", optopt, program_strings[lang][EXIT]);
+               				fprintf (stderr, "| Error 0xb - Unknown option `-%c'.\n| %s...\n", optopt, program_strings[lang][EXIT]);
 					getchar();
              			} else {
-               				fprintf (stderr,"Error 0xc - Unknown option character `\\x%x'.\n%s...\n",optopt, program_strings[lang][EXIT]);
+               				fprintf (stderr,"| Error 0xc - Unknown option character `\\x%x'.\n| %s...\n",optopt, program_strings[lang][EXIT]);
              				getchar();
 				}
            		default:
@@ -252,10 +258,6 @@ int main(int argc, char **argv) {
 	//Should the init-function be executed?
 	if (strcmp(argv[1],"-i") == 0) {
 		init();
-	} else {
-		if (system("clear") == -1) {
-			Error(6);
-		}
 	}
 	//get the HOME variable to locate the config file
 	strncpy(conf_dir, getenv("HOME"), 75);
@@ -272,7 +274,9 @@ int main(int argc, char **argv) {
 		// check which options are set by the user
 	        User_settings = Read_user_options(argc, argv, User_settings);
 	}
-
+	if (system("clear") == -1) {
+                printf("%s\n",errors[lang][6]);
+        }
 	//Open vocabulary file
 	sourcefile = fopen(User_settings.fvalue,"r");
 	vocabfile = fopen("vocab.tmp","w");
