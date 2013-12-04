@@ -1,5 +1,4 @@
 #include <stdlib.h>
-
 #include <stdio.h>
 #include <unistd.h>
 #include <ctype.h>
@@ -11,7 +10,7 @@
 #define MAX_WORDS 5
 #define MAX_TRIES 2
 #define MAX_LENGTH 256
-#define VERSION "2.5"
+#define VERSION "2.6"
 //for getopt
 #define no_argument 0
 #define required_argument 1 
@@ -30,6 +29,7 @@ void Print_general_status(struct Options, struct Statistics, unsigned int);
 struct Statistics Print_statistics(struct Statistics, unsigned int, unsigned int);
 void Write_file_stats(struct Statistics, struct Options);
 unsigned int Main_query(unsigned int, struct Options, unsigned int, unsigned int*);
+struct Options Read_source_filename (struct Options);
 
 //gobal variables
 FILE *vocabfile;
@@ -40,6 +40,7 @@ int error_line;
 int lang;
 char conf_dir[100];
 
+//structure with command line options and user settings
 struct Options {
 	char fvalue[96];// NULL
 	char dvalue[6];	// "1"
@@ -49,7 +50,7 @@ struct Options {
 	int cvalue;	// 1
 	int xvalue;	// 0
 };
-
+//structure with file statistics
 struct Statistics {
 	unsigned int stat_line_num;
 	unsigned int query_num;
@@ -60,7 +61,6 @@ struct Statistics {
 /********************main function********************/
 int main(int argc, char **argv) {
 	/*****VARIABLES*****/
-	//structure with options set by user
 	struct Options User_settings = {
 		.fvalue = "NULL",
 		.dvalue = "1",
@@ -78,43 +78,47 @@ int main(int argc, char **argv) {
 	};
 	char buffer[MAX_LENGTH];
 	char line[MAX_LENGTH];
-	unsigned int pairs = 0; // pair = 1, word = 0;
+	unsigned int pairs = 0;
 	unsigned int i = 0;
-	int index_a, index_b, temp_line; //is_giv, 
-	unsigned int right = 0;// correct = 0, tries = 0;
+	int index_a, index_b, temp_line;
+	unsigned int right = 0;
 	unsigned int lines = 0;
 	/*****END OF VARIABLES*****/
 
 	//get LANG variable
 	lang = Get_LANG();
-	//Program needs option -f
-	if (argc < 2) {
-		Error(0);
-	}
+
+
 	//Should the init-function be executed?
-	if (strcmp(argv[1],"-i") == 0) {
+	if ((argc > 1) && (strcmp(argv[1],"-i") == 0)) {
 		init();
 	}
+	
 	//locate config file
 	Get_conf_dir();
 	// check which options are set by the user
 	User_settings = Read_user_options(argc, argv, User_settings);
+	//Should we load the default settings?
 	if (User_settings.xvalue != 1) {
 		//Read the default configuration of the user
 	        User_settings = Read_user_defaults(conf_dir, User_settings);
-		// check which options are set by the user
+		//check which options are set by the user
 	        User_settings = Read_user_options(argc, argv, User_settings);
 	}
+	//if -f not set, ask manually for filename
+	if (strcmp(User_settings.fvalue, "NULL") == 0) {
+		User_settings = Read_source_filename(User_settings);
+	}	
 	if (system("clear") == -1) {
                 printf("%s\n",errors[lang][6]);
         }
-	//Open vocabulary file
+	//Open vocabulary file and tempfile
 	sourcefile = fopen(User_settings.fvalue,"r");
 	vocabfile = fopen("vocab.tmp","w");
 	if (NULL == vocabfile || NULL == sourcefile) {
 		Error(1);
 	}
-	//copy lines from source to temporary file
+	//copy lines from source to temporary file without comments
 	lines = 0;
 	while((fgets(buffer, sizeof(buffer), sourcefile)) != NULL) {
 		lines++;
@@ -126,14 +130,12 @@ int main(int argc, char **argv) {
 			fputs(buffer, vocabfile);
 		}
 	}
-	
 	//read statistics of vocabulary file
 	File_statistics = Read_file_stats(File_statistics, User_settings);
-	//reopen temporary file to read lines
+	//reopen temporary file in read mode to read lines
 	if (freopen("vocab.tmp","r",vocabfile) == NULL) {
 		Error(7);
 	}
-	
 	//Count lines
 	lines = 0;
 	while ((fgets(line,MAX_LENGTH,vocabfile)) != NULL) {
@@ -144,9 +146,9 @@ int main(int argc, char **argv) {
 	for(i = 0; i < lines; i++) {
 		rand_lines[i] = i+1;
 	}
-	srand(time(NULL));
 	//if -r is set, shuffle array
 	if (User_settings.rvalue == 1) {
+		srand(time(NULL));
 		for (i = 0; i < 10000; i++) {
 			index_a = rand() % lines;
 			index_b = rand() % lines;
@@ -156,6 +158,7 @@ int main(int argc, char **argv) {
 		}
 	}
 	pairs = lines;
+	//How many word pairs should we ask for
 	if (strcmp(User_settings.nvalue, "all") != 0) {
 		pairs = atoi(User_settings.nvalue);
 		if (pairs > lines) {
@@ -165,11 +168,8 @@ int main(int argc, char **argv) {
 	}
 	//status information  are displayed
 	Print_general_status(User_settings, File_statistics, pairs);
-	
 	//main loop with query
 	right = Main_query(pairs, User_settings, lines, rand_lines);
-	
-	
 	//Print new statistics about this file
 	File_statistics = Print_statistics(File_statistics, pairs, right);
 	//Write new statictics in file using temporary file and renaming it later
@@ -203,12 +203,12 @@ int Error(int error_num) {
 void Print_help(void) {
 	printf("\nVocabC %s\n",VERSION);
 	printf("\n%s: VocabC -f <%s> [-h] [-r] [-d1|-d2|-dr] [-n <num>] [-s] [-c] [-x]\n", program_strings[lang][USE],program_strings[lang][VFILE]);
-	printf("\n -f, --file\t\t\tSelect vocabulary file\n -h, --help\t\t\t %s\n -r, --random\t\t\t %s\n", program_strings[lang][HELP], program_strings[lang][RAND]);
-	printf(" -d1, --direction1\t\t %s\n -d2, --direction2\t\t %s\n -dr, --directionr\t\t %s\n", program_strings[lang][D1], program_strings[lang][D2], program_strings[lang][DR]);
-	printf(" -n, --word-number <num>\t\t %s\n", program_strings[lang][NUM]);
-	printf(" -s, --case-sensitive\t\t %s\n", program_strings[lang][CASE_S]);
-	printf(" -c, --comments\t\t\t %s\n", program_strings[lang][IGN_COMM]);
-	printf(" -x, --ignore-defaults\t\t %s\n\n", program_strings[lang][IGN_SET]);
+	printf("\n -f, --file\t\t\tSelect vocabulary file\n -h, --help\t\t\t%s\n -r, --random\t\t\t%s\n", program_strings[lang][HELP], program_strings[lang][RAND]);
+	printf(" -d1, --direction1\t\t%s\n -d2, --direction2\t\t%s\n -dr, --directionr\t\t%s\n", program_strings[lang][D1], program_strings[lang][D2], program_strings[lang][DR]);
+	printf(" -n, --word-number <num>\t%s\n", program_strings[lang][NUM]);
+	printf(" -s, --case-sensitive\t\t%s\n", program_strings[lang][CASE_S]);
+	printf(" -c, --comments\t\t\t%s\n", program_strings[lang][IGN_COMM]);
+	printf(" -x, --ignore-defaults\t\t%s\n\n", program_strings[lang][IGN_SET]);
 }
 //Get the environment variable LANG
 int Get_LANG (void) {
@@ -241,14 +241,14 @@ struct Options Read_user_options (int argc, char **argv, struct Options User_opt
 	while (1) {
 		static struct option long_options[] =
 			{
-			{"help",     no_argument,      0, 'h'},
-			{"random",  no_argument,       0, 'r'},
-			{"direction",  required_argument, 0, 'd'},
-			{"word-number",  required_argument, 0, 'n'},
-			{"comments",  no_argument, 0, 'c'},
-			{"case-sensitive",  no_argument, 0, 's'},
-			{"ignore-default",  no_argument, 0, 'x'},
-			{"file",    required_argument, 0, 'f'},
+			{"help", no_argument, 0, 'h'},
+			{"random", no_argument,0, 'r'},
+			{"direction", required_argument, 0, 'd'},
+			{"word-number", required_argument, 0, 'n'},
+			{"comments", no_argument, 0, 'c'},
+			{"case-sensitive", no_argument, 0, 's'},
+			{"ignore-default", no_argument, 0, 'x'},
+			{"file", required_argument, 0, 'f'},
 			{0, 0, 0, 0}
 		};
 		/* getopt_long stores the option index here. */
@@ -399,6 +399,16 @@ struct Options Read_user_defaults (char *conf_dir, struct Options User_settings)
 	}
 	return User_settings;
 }
+
+struct Options Read_source_filename (struct Options User_settings) {
+	printf("Please enter the path to the file you want to open as vocabulary source file:\n");
+	fgets(User_settings.fvalue, 96, stdin);
+	while (User_settings.fvalue[strlen(User_settings.fvalue)-1] == '\n') {
+		User_settings.fvalue[strlen(User_settings.fvalue)-1] = '\0';
+	}
+	return User_settings;
+}
+
 
 struct Statistics Read_file_stats(struct Statistics File_statistics, struct Options User_settings) {
 	char *ptr;
