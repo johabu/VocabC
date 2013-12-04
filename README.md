@@ -12,7 +12,8 @@ Platforms
 ----------
 Current version: 2.5
 
-version 2.x works on GNU/Linux systems with Kernel 3.x and gcc 4.7 (tested on Ubuntu 13.04; x86-64)
+version 2.x works on GNU/Linux systems with Kernel 3.x and gcc 4.4 or higher 
+(tested on Ubuntu 11.10, 12.04, 12.10, 13.04, 13.10; x86-64)
 
 Installing
 -----------
@@ -48,6 +49,7 @@ The output of VocabC is displayed in the language stored in $LANG.
 (At the moment 3 languages: English, German and Spanish)
 
 1.	Creating vocabulary file
+
 	To use the program, first create a vocab file.
 	*The vocab has to be in this format:*	
 	`word1 = word2a, word2b`	
@@ -58,17 +60,17 @@ The output of VocabC is displayed in the language stored in $LANG.
 		german   =deutsch,alemán	
 		to fit   =caber#in english	
 
-	several meanings possible
+	-> several meanings possible
 
-	comments with `#` (must be the first character in the line)
+	-> comments with `#` (must be the first character in the line)
 
-	many languages possible (ISO 8859-15)
+	-> many languages possible (ISO 8859-15)
 
-	spaces possible
+	-> spaces possible
 
-	comments on only one side  possible	
+	-> comments on only one side  possible	
 
-	See also the vocabulary file "example.txt"
+	-> See also the vocabulary file "example.txt"
 
 2.	Start the program:
 
@@ -106,7 +108,7 @@ The output of VocabC is displayed in the language stored in $LANG.
 
 3.	Behaviour of the program:
 
-	At first the program prints some information like the number of words 
+	First the program prints some information like the number of words 
 	which are going to be asked.
 	The program asks you for the word on the right side in the file.
 	(when you set -d2 (-dr) , it asks you (maybe) for the left one)

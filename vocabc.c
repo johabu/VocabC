@@ -5,20 +5,40 @@
 #include <ctype.h>
 #include <string.h>
 #include <time.h>
+#include <getopt.h>
 #include "vocabc_lang.h"
 
 #define MAX_WORDS 5
 #define MAX_TRIES 2
 #define MAX_LENGTH 256
 #define VERSION "2.5"
+//for getopt
+#define no_argument 0
+#define required_argument 1 
+#define optional_argument 2
 
+//functions
+int init(void);
+int Error(int);
+void Print_help(void);
+int Get_LANG (void);
+void Get_conf_dir (void);
+struct Options Read_user_options (int, char**, struct Options);
+struct Options Read_user_defaults (char*, struct Options);
+struct Statistics Read_file_stats(struct Statistics, struct Options);
+void Print_general_status(struct Options, struct Statistics, unsigned int);
+struct Statistics Print_statistics(struct Statistics, unsigned int, unsigned int);
+void Write_file_stats(struct Statistics, struct Options);
+unsigned int Main_query(unsigned int, struct Options, unsigned int, unsigned int*);
 
+//gobal variables
 FILE *vocabfile;
 FILE *sourcefile;
 FILE *source_temp;
 FILE *config;
-int glo_var;
+int error_line;
 int lang;
+char conf_dir[100];
 
 struct Options {
 	char fvalue[96];// NULL
@@ -30,14 +50,144 @@ struct Options {
 	int xvalue;	// 0
 };
 
-//Init function (VocabC -i); code at the end of file
-int init(void);
-void Print_help(void);
+struct Statistics {
+	unsigned int stat_line_num;
+	unsigned int query_num;
+	float best_percentage;
+	float average_percentage;
+};
 
+/********************main function********************/
+int main(int argc, char **argv) {
+	/*****VARIABLES*****/
+	//structure with options set by user
+	struct Options User_settings = {
+		.fvalue = "NULL",
+		.dvalue = "1",
+		.nvalue = "all",
+		.rvalue = 0,
+		.svalue = 0,
+		.cvalue = 1,
+		.xvalue = 0
+	};
+	struct Statistics File_statistics = {
+		.stat_line_num = 0,
+		.query_num = 0,
+		.best_percentage = 0,
+		.average_percentage = 0,
+	};
+	char buffer[MAX_LENGTH];
+	char line[MAX_LENGTH];
+	unsigned int pairs = 0; // pair = 1, word = 0;
+	unsigned int i = 0;
+	int index_a, index_b, temp_line; //is_giv, 
+	unsigned int right = 0;// correct = 0, tries = 0;
+	unsigned int lines = 0;
+	/*****END OF VARIABLES*****/
+
+	//get LANG variable
+	lang = Get_LANG();
+	//Program needs option -f
+	if (argc < 2) {
+		Error(0);
+	}
+	//Should the init-function be executed?
+	if (strcmp(argv[1],"-i") == 0) {
+		init();
+	}
+	//locate config file
+	Get_conf_dir();
+	// check which options are set by the user
+	User_settings = Read_user_options(argc, argv, User_settings);
+	if (User_settings.xvalue != 1) {
+		//Read the default configuration of the user
+	        User_settings = Read_user_defaults(conf_dir, User_settings);
+		// check which options are set by the user
+	        User_settings = Read_user_options(argc, argv, User_settings);
+	}
+	if (system("clear") == -1) {
+                printf("%s\n",errors[lang][6]);
+        }
+	//Open vocabulary file
+	sourcefile = fopen(User_settings.fvalue,"r");
+	vocabfile = fopen("vocab.tmp","w");
+	if (NULL == vocabfile || NULL == sourcefile) {
+		Error(1);
+	}
+	//copy lines from source to temporary file
+	lines = 0;
+	while((fgets(buffer, sizeof(buffer), sourcefile)) != NULL) {
+		lines++;
+		if (buffer[0] != '#') {
+			if (strchr(buffer,'=') == NULL) {
+				error_line = lines;
+				Error(8);
+			}
+			fputs(buffer, vocabfile);
+		}
+	}
+	
+	//read statistics of vocabulary file
+	File_statistics = Read_file_stats(File_statistics, User_settings);
+	//reopen temporary file to read lines
+	if (freopen("vocab.tmp","r",vocabfile) == NULL) {
+		Error(7);
+	}
+	
+	//Count lines
+	lines = 0;
+	while ((fgets(line,MAX_LENGTH,vocabfile)) != NULL) {
+		lines++;
+	}
+	unsigned int rand_lines[lines-1];
+	//fill array with line numbers
+	for(i = 0; i < lines; i++) {
+		rand_lines[i] = i+1;
+	}
+	srand(time(NULL));
+	//if -r is set, shuffle array
+	if (User_settings.rvalue == 1) {
+		for (i = 0; i < 10000; i++) {
+			index_a = rand() % lines;
+			index_b = rand() % lines;
+			temp_line = rand_lines[index_a];
+			rand_lines[index_a] = rand_lines[index_b];
+			rand_lines[index_b] = temp_line;
+		}
+	}
+	pairs = lines;
+	if (strcmp(User_settings.nvalue, "all") != 0) {
+		pairs = atoi(User_settings.nvalue);
+		if (pairs > lines) {
+			//Error(2);
+			pairs = lines;
+		}
+	}
+	//status information  are displayed
+	Print_general_status(User_settings, File_statistics, pairs);
+	
+	//main loop with query
+	right = Main_query(pairs, User_settings, lines, rand_lines);
+	
+	
+	//Print new statistics about this file
+	File_statistics = Print_statistics(File_statistics, pairs, right);
+	//Write new statictics in file using temporary file and renaming it later
+	Write_file_stats(File_statistics, User_settings);
+	//End of program, remove temporary file
+	if (remove("vocab.tmp") < 0) {
+		Error(5);
+	}
+	printf("\n| %s...\n",program_strings[lang][EXIT]);
+	getchar();
+       	return EXIT_SUCCESS;
+}
+
+/********************functions********************/
 //Function for displaying an error
 int Error(int error_num) {
 	if (error_num == 8) {
-		printf("| Error %#x - %s %d!\n", error_num, errors[lang][error_num], glo_var);
+		printf("| Error %#x - %s %d!\n", error_num, errors[lang][error_num], error_line);
 	} else {
 		printf("| Error %#x - %s!\n", error_num, errors[lang][error_num]);
 	}
@@ -47,37 +197,85 @@ int Error(int error_num) {
 		remove("vocab.tmp");
 	}
 	Print_help();
-	printf("| %s...\n",program_strings[lang][EXIT]);
-	getchar();
 	exit(EXIT_FAILURE);
 }
-
+//Function for displaying a help text
 void Print_help(void) {
 	printf("\nVocabC %s\n",VERSION);
 	printf("\n%s: VocabC -f <%s> [-h] [-r] [-d1|-d2|-dr] [-n <num>] [-s] [-c] [-x]\n", program_strings[lang][USE],program_strings[lang][VFILE]);
-	printf("\n%s:\n-h\t\t: %s\n-r\t\t: %s\n", program_strings[lang][OPTARG], program_strings[lang][HELP], program_strings[lang][RAND]);
-	printf("-d1\t\t: %s\n-d2\t\t: %s\n-dr\t\t: %s\n", program_strings[lang][D1], program_strings[lang][D2], program_strings[lang][DR]);
-	printf("-n <num>\t: %s\n", program_strings[lang][NUM]);
-	printf("-s\t\t: %s\n", program_strings[lang][CASE_S]);
-	printf("-c\t\t: %s\n", program_strings[lang][IGN_COMM]);
-	printf("-x\t\t: %s\n\n", program_strings[lang][IGN_SET]);
+	printf("\n -f, --file\t\t\tSelect vocabulary file\n -h, --help\t\t\t %s\n -r, --random\t\t\t %s\n", program_strings[lang][HELP], program_strings[lang][RAND]);
+	printf(" -d1, --direction1\t\t %s\n -d2, --direction2\t\t %s\n -dr, --directionr\t\t %s\n", program_strings[lang][D1], program_strings[lang][D2], program_strings[lang][DR]);
+	printf(" -n, --word-number <num>\t\t %s\n", program_strings[lang][NUM]);
+	printf(" -s, --case-sensitive\t\t %s\n", program_strings[lang][CASE_S]);
+	printf(" -c, --comments\t\t\t %s\n", program_strings[lang][IGN_COMM]);
+	printf(" -x, --ignore-defaults\t\t %s\n\n", program_strings[lang][IGN_SET]);
+}
+//Get the environment variable LANG
+int Get_LANG (void) {
+	int lang;
+	char lang_code[20];
+	strncpy(lang_code, getenv("LANG"), 19);
+        lang_code[19] = '\0';
+        if (strstr(lang_code,"de") != NULL) {
+                lang = 1;
+        } else if (strstr(lang_code,"es") != NULL) {
+                lang = 2;
+        } else {
+                lang = 0;
+        }
+	return lang;
+}
+//Locate configuration directory ($HOME/.config/vocabc/config)
+void Get_conf_dir (void) {
+	strncpy(conf_dir, getenv("HOME"), 75);
+	conf_dir[75] = '\0';
+	if (conf_dir == NULL) {
+		Error(9);
+	}
+	strncat(conf_dir,"/.config/vocabc/config",100);
 }
 
 //Read the options the user set when starting VocabC
 struct Options Read_user_options (int argc, char **argv, struct Options User_options) {
-	//variables for getopt
-	int CHAR;
-	opterr = 0;
-	// check which options are set by the user
-	while ((CHAR = getopt (argc, argv, "hrf:d:n:scx")) != -1) {
-		switch (CHAR) {
-          		case 'h':
+	int c;
+	while (1) {
+		static struct option long_options[] =
+			{
+			{"help",     no_argument,      0, 'h'},
+			{"random",  no_argument,       0, 'r'},
+			{"direction",  required_argument, 0, 'd'},
+			{"word-number",  required_argument, 0, 'n'},
+			{"comments",  no_argument, 0, 'c'},
+			{"case-sensitive",  no_argument, 0, 's'},
+			{"ignore-default",  no_argument, 0, 'x'},
+			{"file",    required_argument, 0, 'f'},
+			{0, 0, 0, 0}
+		};
+		/* getopt_long stores the option index here. */
+		int option_index = 0;
+		c = getopt_long (argc, argv, "hrf:d:n:scx",
+			long_options, &option_index);
+		/* Detect the end of the options. */
+		if (c == -1)
+			break;
+		switch (c) {
+			case 0:
+				/* If this option set a flag, do nothing else now. */
+				if (long_options[option_index].flag != 0)
+					break;
+				printf ("option %s", long_options[option_index].name);
+				if (optarg)
+				printf (" with arg %s", optarg);
+				printf ("\n");
+				break;
+			case 'h':
 				Print_help();
 				exit(EXIT_FAILURE);
-            		case 'f':
+				break;
+			case 'f':
 				strncpy(User_options.fvalue, optarg, 95);
 				User_options.fvalue[95] = '\0';
-             			break;
+				break;
 			case 'r':
 				User_options.rvalue = 1;
 				break;
@@ -98,20 +296,22 @@ struct Options Read_user_options (int argc, char **argv, struct Options User_opt
 			case 'x':
 				User_options.xvalue = 1;
 				break;
-           		case '?':
-             			if (optopt == 'f' || optopt == 'd') {
-               				fprintf (stderr, "| Error 0xa - Option -%c requires an argument.\n| %s...\n", optopt, program_strings[lang][EXIT]);
+			case '?':
+				/* getopt_long already printed an error message. */
+				/*if (optopt == 'f' || optopt == 'd') {
+					fprintf (stderr, "| Error 0xa - Option -%c requires an argument.\n| %s...\n", optopt, program_strings[lang][EXIT]);
 					getchar();
-             			} else if (isprint (optopt)) {
-               				fprintf (stderr, "| Error 0xb - Unknown option `-%c'.\n| %s...\n", optopt, program_strings[lang][EXIT]);
-					getchar();
-             			} else {
-               				fprintf (stderr,"| Error 0xc - Unknown option character `\\x%x'.\n| %s...\n",optopt, program_strings[lang][EXIT]);
-             				getchar();
-				}
-           		default:
-             			exit(EXIT_FAILURE);
-           	}
+				} else if (isprint (optopt)) {
+					fprintf (stderr, "| Error 0xb - Unknown option `-%c'.\n| %s...\n", optopt, program_strings[lang][EXIT]);
+                                        getchar();
+                                } else {
+                                        fprintf (stderr,"| Error 0xc - Unknown option character `\\x%x'.\n| %s...\n",optopt, program_strings[lang][EXIT]);
+                                        getchar();
+                                }*/
+				break;
+			default:
+				abort ();
+		}
 	}
 	return User_options;
 }
@@ -200,108 +400,19 @@ struct Options Read_user_defaults (char *conf_dir, struct Options User_settings)
 	return User_settings;
 }
 
-
-//Main function with query
-int main(int argc, char **argv) {
-	/*****VARIABLES*****/
-	//structure with options set by user
-	struct Options User_settings = {
-		.fvalue = "NULL",
-		.dvalue = "1",
-		.nvalue = "all",
-		.rvalue = 0,
-		.svalue = 0,
-		.cvalue = 1,
-		.xvalue = 0
-	};	
-	//variables for query and output
-	char buffer[MAX_LENGTH], source_str[MAX_LENGTH], input_str[MAX_LENGTH];
-	char comm_str[MAX_LENGTH], lang1_comm[MAX_LENGTH], lang2_comm[MAX_LENGTH];
-	char lang1_word[MAX_LENGTH], lang1_str[MAX_LENGTH], lang2_str[MAX_LENGTH];
-	char line[MAX_LENGTH], temp[MAX_LENGTH], temp_word[MAX_LENGTH], lang2_temp_str[MAX_LENGTH];
-	char lang2_word[MAX_WORDS][MAX_LENGTH];
+struct Statistics Read_file_stats(struct Statistics File_statistics, struct Options User_settings) {
 	char *ptr;
-	char lang_code[20], conf_dir[100];
-	//different tokens for dividing strings
-	char lang_token[] = "=\n", word_token[] = ",", comm_token[] = "#";
-	unsigned int pairs = 0, pair = 1, lines = 0, word = 0;
-	//loop variables
-	unsigned int i, j, l, k = 0;
-	int is_giv, index_a, index_b, temp_line;
-	unsigned int right = 0, correct = 0, tries = 0;
-	char direction[2] = "1";
-	float percent;
-	//variables for bar
-	float bar_num, bar_loop;
-	//variables for statistics
-	unsigned int stat_line_num = 0, query_num = 0;
+	char buffer[MAX_LENGTH];
+	int i = 0;
+	File_statistics.stat_line_num = 0, File_statistics.query_num = 0;
 	char stat_line[MAX_LENGTH];
 	char stats[5][MAX_LENGTH];
-	float best_percentage = 0, average_percentage = 0;
-        char source_temp_str[100];
-	/*****END OF VARIABLES*****/
-
-	//get LANG variable
-	strncpy(lang_code, getenv("LANG"), 19);
-	lang_code[19] = '\0';
-	if (strstr(lang_code,"de") != NULL) {
-		lang = 1;
-	} else if (strstr(lang_code,"es") != NULL) {
-		lang = 2;
-	} else {
-		lang = 0;
-	}
-	//Program needs option -f
-	if (argc < 2) {
-		Error(0);
-	}
-	//Should the init-function be executed?
-	if (strcmp(argv[1],"-i") == 0) {
-		init();
-	}
-	//get the HOME variable to locate the config file
-	strncpy(conf_dir, getenv("HOME"), 75);
-	conf_dir[75] = '\0';
-	if (conf_dir == NULL) {
-		Error(9);
-	}
-	strncat(conf_dir,"/.config/vocabc/config",100);
-	// check which options are set by the user
-	User_settings = Read_user_options(argc, argv, User_settings);
-	if (User_settings.xvalue != 1) {
-		//Read the default configuration of the user
-	        User_settings = Read_user_defaults(conf_dir, User_settings);
-		// check which options are set by the user
-	        User_settings = Read_user_options(argc, argv, User_settings);
-	}
-	if (system("clear") == -1) {
-                printf("%s\n",errors[lang][6]);
-        }
-	//Open vocabulary file
-	sourcefile = fopen(User_settings.fvalue,"r");
-	vocabfile = fopen("vocab.tmp","w");
-	if (NULL == vocabfile || NULL == sourcefile) {
-		Error(1);
-	}
-	lines = 0;
-	//copy lines from source to temporary file
-	while((fgets(buffer, sizeof(buffer), sourcefile)) != NULL) {
-		lines++;
-		if (buffer[0] != '#') {
-			if (strchr(buffer,'=') == NULL) {
-				glo_var = lines;
-				Error(8);
-			}
-			fputs(buffer, vocabfile);
-		}
-	}
-	//read statistics of vocabulary file
-	i = 0;
+	File_statistics.best_percentage = 0, File_statistics.average_percentage = 0;
 	fseek(sourcefile, 0L, SEEK_SET);
 	while (fgets(buffer, MAX_LENGTH, sourcefile) != NULL ) {
 		if (strstr(buffer,"#STATS#") != 0 ) {
 			strcpy(stat_line,buffer);
-			stat_line_num = i;
+			File_statistics.stat_line_num = i;
 		}
 		i++;
 	}
@@ -312,9 +423,9 @@ int main(int argc, char **argv) {
 		ptr = strtok(NULL, "#");
 		i++;
 	}
-	query_num = atoi(stats[1]);
-	average_percentage = strtof(stats[2], NULL) * 100;
-	best_percentage = strtof(stats[3], NULL) * 100;
+	File_statistics.query_num = atoi(stats[1]);
+	File_statistics.average_percentage = strtof(stats[2], NULL) * 100;
+	File_statistics.best_percentage = strtof(stats[3], NULL) * 100;
 	//first query? -> adding statistic-string
 	if (strcmp(stats[0], "STATS") != 0) {
 		if (freopen(User_settings.fvalue,"a+",sourcefile) == NULL )
@@ -330,49 +441,35 @@ int main(int argc, char **argv) {
         	while (fgets(buffer, MAX_LENGTH, sourcefile) != NULL ) {
         	        if (strstr(buffer,"#STATS#") != 0 ) {
         	                strcpy(stat_line,buffer);
-        	                stat_line_num = i;
+        	                File_statistics.stat_line_num = i;
         	        }
         	        i++;
         	}
 	}
-	//reopen temporary file to read lines
-	if (freopen("vocab.tmp","r",vocabfile) == NULL) {
-		Error(7);
+	return File_statistics;
+}
+
+void Write_file_stats(struct Statistics File_statistics, struct Options User_settings) {
+	char buffer[MAX_LENGTH];
+	char source_temp_str[100];
+	strncpy(source_temp_str, User_settings.fvalue, 100);
+	strncat(source_temp_str, ".tmp", 10);
+	source_temp = fopen(source_temp_str, "w");
+	fseek(sourcefile,0L,SEEK_SET);
+	unsigned int i = 0;
+	while(((fgets(buffer, sizeof(buffer), sourcefile)) != NULL) && (i < File_statistics.stat_line_num))  {
+		fputs(buffer, source_temp);
+		i++;
 	}
-	//Count lines
-	lines = 0;
-	while ((fgets(line,MAX_LENGTH,vocabfile)) != NULL) {
-		lines++;
-	}
-	srand(time(NULL));
-	unsigned int rand_lines[lines-1];
-	//fill array with line numbers
-	for(i = 0; i < lines; i++) {
-		rand_lines[i] = i+1;
-	}
-	//if -r is set, shuffle array
-	if (User_settings.rvalue == 1) {
-		for (i = 0; i < 10000; i++) {
-			index_a = rand() % lines;
-			index_b = rand() % lines;
-			temp_line = rand_lines[index_a];
-			rand_lines[index_a] = rand_lines[index_b];
-			rand_lines[index_b] = temp_line;
-		}
-	}
-	//How many words should be asked?
-		//ask all pairs
-	if (strcmp(User_settings.nvalue, "all") == 0) {
-		pairs = lines;
-	} else {
-		//ask only -n <num> words
-		pairs = atoi(User_settings.nvalue);
-	}
-	if (pairs > lines) {
-		//Error(2);
-		pairs = lines;
-	}
-	//First output of the program - status information  are displayed
+	File_statistics.query_num++;
+	fprintf(source_temp, "#STATS#%d#%.3f#%.3f#\n",File_statistics.query_num, (File_statistics.average_percentage / 100), (File_statistics.best_percentage / 100));
+	fclose(source_temp);
+	fclose(vocabfile);
+	fclose(sourcefile);
+	rename(source_temp_str, User_settings.fvalue);
+}
+
+void Print_general_status(struct Options User_settings, struct Statistics File_statistics, unsigned int pairs) {
 	printf("------------------------------------------------------------------------\n");
 	printf("| VocabC - %s %s   %s <https://github.com/johabu>\n|\n",status_strings[lang][VERS],VERSION,status_strings[lang][DEVELOP]);
 	printf("| %s:\n| %s: %s\n|",status_strings[lang][STATUS],status_strings[lang][VOCFILE],User_settings.fvalue);
@@ -386,11 +483,31 @@ int main(int argc, char **argv) {
 	}
 	if (User_settings.cvalue == 1) { printf(" %s\n|",status_strings[lang][COMMENT]); }
 	printf(" %d %s\n",pairs,status_strings[lang][PAIRS]);
-	printf("|\n| %s: %d\n",status_strings[lang][QUERY_NUM], query_num);
-	printf("| %s: %g%%\n| %s: %g%%\n", status_strings[lang][AV_PER], average_percentage, status_strings[lang][TOP_PER], best_percentage);
+	printf("|\n| %s: %d\n",status_strings[lang][QUERY_NUM], File_statistics.query_num);
+	printf("| %s: %g%%\n| %s: %g%%\n", status_strings[lang][AV_PER], File_statistics.average_percentage, status_strings[lang][TOP_PER], File_statistics.best_percentage);
 	printf("------------------------------------------------------------------------\n\n");
+}
 
-	//main loop with query
+unsigned int Main_query(unsigned int pairs, struct Options User_settings, unsigned int lines, unsigned int rand_lines[lines-1]) {
+	//variables for query and output
+	char source_str[MAX_LENGTH], input_str[MAX_LENGTH];
+	char comm_str[MAX_LENGTH], lang1_comm[MAX_LENGTH], lang2_comm[MAX_LENGTH];
+	char lang1_word[MAX_LENGTH], lang1_str[MAX_LENGTH], lang2_str[MAX_LENGTH];
+	char temp[MAX_LENGTH], temp_word[MAX_LENGTH], lang2_temp_str[MAX_LENGTH];
+	char lang2_word[MAX_WORDS][MAX_LENGTH];
+	char *ptr;
+	//different tokens for dividing strings
+	char lang_token[] = "=\n", word_token[] = ",", comm_token[] = "#";
+	unsigned int pair = 1, word = 0;
+	//loop variables
+	unsigned int i, j, l, k = 0;
+	int is_giv;
+	unsigned int right = 0, correct = 0, tries = 0;
+	char direction[2] = "1";
+	float percent;
+	//variables for bar
+	float bar_num, bar_loop;
+	
 	for (i = 0; i < pairs; i++) {
 		strcpy(comm_str,"NULL");
 		strcpy(lang1_comm,"NULL");
@@ -593,40 +710,23 @@ int main(int argc, char **argv) {
 		printf("\n-------------------------------------------------------------------------\n");
 		pair++;
 	}
+	return right;
+}
+
+
+struct Statistics Print_statistics(struct Statistics File_statistics, unsigned int pairs, unsigned int right) {
+	float percent;
 	percent = (float) right / (float) pairs * 100;
 	printf("\n| %s %g%% (%d/%d) %s.\n",query_strings[lang][ANALYSIS1],percent,right,pairs,query_strings[lang][ANALYSIS2]);
 
-	if (percent > best_percentage) {
-		printf("| %s: %.1f%%\t%s: %.1f%%\n",status_strings[lang][NEW_BEST], percent, status_strings[lang][OLD], best_percentage);
-		best_percentage = percent;
+	if (percent > File_statistics.best_percentage) {
+		printf("| %s: %.1f%%\t%s: %.1f%%\n",status_strings[lang][NEW_BEST], percent, status_strings[lang][OLD], File_statistics.best_percentage);
+		File_statistics.best_percentage = percent;
 	}
-	printf("| %s: %.1f%%\n", status_strings[lang][OLD_AV], average_percentage);
-	average_percentage = ((average_percentage * query_num) + percent) / (query_num + 1);
-	printf("| %s: %.1f%%\n", status_strings[lang][NEW_AV], average_percentage);
-	//Write new statictics in file using temporary file and renaming it later 
-	strncpy(source_temp_str, User_settings.fvalue, 100);
-	strncat(source_temp_str, ".tmp", 10);
-	source_temp = fopen(source_temp_str, "w");
-	fseek(sourcefile,0L,SEEK_SET);
-	i = 0;
-	while(((fgets(buffer, sizeof(buffer), sourcefile)) != NULL) && (i < stat_line_num))  {
-		fputs(buffer, source_temp);
-		i++;
-	}
-	query_num++;
-	fprintf(source_temp, "#STATS#%d#%.3f#%.3f#\n",query_num, (average_percentage / 100), (best_percentage / 100));
-	fclose(source_temp);
-
-	//End of program, close files, remove temporary file
-	fclose(vocabfile);
-	fclose(sourcefile);
-	rename(source_temp_str, User_settings.fvalue);
-	if (remove("vocab.tmp") < 0) {
-		Error(5);
-	}
-	printf("\n| %s...\n",program_strings[lang][EXIT]);
-	getchar();
-       	return EXIT_SUCCESS;
+	printf("| %s: %.1f%%\n", status_strings[lang][OLD_AV], File_statistics.average_percentage);
+	File_statistics.average_percentage = ((File_statistics.average_percentage * File_statistics.query_num) + percent) / (File_statistics.query_num + 1);
+	printf("| %s: %.1f%%\n", status_strings[lang][NEW_AV], File_statistics.average_percentage);
+	return File_statistics;
 }
 
 //Init function; exucute when installing VocabC; generating configuartion file for default user settings

@@ -7,9 +7,6 @@ random = true
 #Set to "r", to choose direction randomly for each word pair.
 direction = 1
 #
-#Word pairs: "All" to ask all word pairs of a file by default, or number >0.
-pairs = all
-#
 #Case sensitivity: set to "true" to set case sensitivity by default, or to "false".
 sensitivity = false
 #
