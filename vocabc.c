@@ -213,18 +213,21 @@ void Print_help(void) {
 //Get the environment variable LANG
 int Get_LANG (void) {
 	int lang;
-	char lang_code[20];
-	strncpy(lang_code, getenv("LANG"), 19);
-        lang_code[19] = '\0';
-        if (strstr(lang_code,"de") != NULL) {
-                lang = 1;
-        } else if (strstr(lang_code,"es") != NULL) {
-                lang = 2;
-        } else {
+	char *lang_code;
+	if ((lang_code = getenv("LANG")) != NULL) {
+	        if (strstr(lang_code,"de") != NULL) {
+	                lang = 1;
+	        } else if (strstr(lang_code,"es") != NULL) {
+	                lang = 2;
+	        } else {
+			lang = 0;
+		}
+	} else {
                 lang = 0;
         }
 	return lang;
 }
+
 //Locate configuration directory ($HOME/.config/vocabc/config)
 void Get_conf_dir (void) {
 	strncpy(conf_dir, getenv("HOME"), 75);
