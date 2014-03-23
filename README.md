@@ -1,19 +1,29 @@
 README for VocabC
 ==================
-Developed by Johabu <http://johabu.spheniscida.de>; <http://github.com/johabu>
+Developed by Johannes Bucher <http://github.com/johabu>
 This file is part of VocabC.
-VocabC is free software; you can modify it or redistribute it 
-under the terms of the GNU General Public License as published by
-the Free Software Foundation <http://www.fsf.org>, either version 3,
-or (at your option) any later version.
-See <http://www.gnu.org/licenses> for the license, if you haven't received a copy of it (GNU\_GPL.txt).
-VocabC is distributed without any warranty!
+
+VocabC is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 Platforms
 ----------
 Current version: 2.6
 
-version 2.x works on GNU/Linux systems with Kernel 3.x and gcc 4.4 or higher 
-(tested on x86-64, armv6l;  Ubuntu 11.10, 12.04, 12.10, 13.04, 13.10, Debian 7.2)
+version 2.x works on GNU/Linux systems with Kernel 3.x and gcc 4.4 or higher
+
+Tested architecture: x86-64, armv6l
+Tested distributions: Ubuntu 12.04, 12.10, 13.04, 13.10, Debian 7.2
 
 
 Installing
@@ -127,6 +137,7 @@ Following error codes may occur:
 
 *	0	You didn't specify a vocabulary file using the -f option.
 		You have to specify a file name using VocabC -f <file>.
+		[Obsolete since version 2.6]
 *	0x1	The file you specified could not be opened. 
 		Check if file exists and check permissions.
 *	0x3	Error while reading the vocabulary file.

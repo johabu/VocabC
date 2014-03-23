@@ -1,3 +1,20 @@
+/*
+This file is part of VocabC.
+
+VocabC is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -202,13 +219,13 @@ int Error(int error_num) {
 //Function for displaying a help text
 void Print_help(void) {
 	printf("\nVocabC %s\n",VERSION);
-	printf("\n%s: VocabC -f <%s> [-h] [-r] [-d1|-d2|-dr] [-n <num>] [-s] [-c] [-x]\n", program_strings[lang][USE],program_strings[lang][VFILE]);
-	printf("\n -f, --file\t\t\tSelect vocabulary file\n -h, --help\t\t\t%s\n -r, --random\t\t\t%s\n", program_strings[lang][HELP], program_strings[lang][RAND]);
+	printf("\n%s: VocabC [-f <%s>] [-h] [-r] [-d1|-d2|-dr] [-n <num>] [-s] [-c] [-x]\n", program_strings[lang][USE],program_strings[lang][VFILE]);
+	printf("\n -f,  --file\t\t\tSelect vocabulary file\n -h,  --help\t\t\t%s\n -r,  --random\t\t\t%s\n", program_strings[lang][HELP], program_strings[lang][RAND]);
 	printf(" -d1, --direction1\t\t%s\n -d2, --direction2\t\t%s\n -dr, --directionr\t\t%s\n", program_strings[lang][D1], program_strings[lang][D2], program_strings[lang][DR]);
-	printf(" -n, --word-number <num>\t%s\n", program_strings[lang][NUM]);
-	printf(" -s, --case-sensitive\t\t%s\n", program_strings[lang][CASE_S]);
-	printf(" -c, --comments\t\t\t%s\n", program_strings[lang][IGN_COMM]);
-	printf(" -x, --ignore-defaults\t\t%s\n\n", program_strings[lang][IGN_SET]);
+	printf(" -n,  --word-number <num>\t%s\n", program_strings[lang][NUM]);
+	printf(" -s,  --case-sensitive\t\t%s\n", program_strings[lang][CASE_S]);
+	printf(" -c,  --comments\t\t%s\n", program_strings[lang][IGN_COMM]);
+	printf(" -x,  --ignore-defaults\t\t%s\n\n", program_strings[lang][IGN_SET]);
 }
 //Get the environment variable LANG
 int Get_LANG (void) {
